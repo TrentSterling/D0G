@@ -1,10 +1,10 @@
 IN vec3 vPos;
-IN vec2 vTexCoord0;
+IN vec2 vTexCoord;
 
 OUT vec2 baseTexCoord;
 
 void main()
 {
 	gl_Position = vec4(vPos, 1.0);
-	baseTexCoord = vTexCoord0;
+	baseTexCoord = vTexCoord;
 }
