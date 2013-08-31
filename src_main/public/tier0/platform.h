@@ -44,6 +44,11 @@
 #include <alloca.h>
 #endif // _LINUX
 
+#ifdef __arm__
+// need this for silent crash on ARM
+#include <signal.h>
+#endif // __arm__
+
 #include <malloc.h>
 #include <new.h>
 
@@ -262,7 +267,7 @@ typedef void * HINSTANCE;
 #elif defined( _X360 )
 #define DebuggerBreak() DebugBreak()
 #elif defined(__arm__)
-#define DebuggerBreak() __asm__ __volatile__ ("bkpt 0\n")
+#define DebuggerBreak() raise(SIGTRAP)
 #else
 #define DebuggerBreak()  {}
 #endif
