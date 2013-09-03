@@ -30,7 +30,7 @@ inline int wcsnicmp(const wchar_t *string1, const wchar_t *string2, size_t count
 {
 	_wcsnicmp(string1, string2, count);
 }
-#endif
+#endif // !_WIN32
 
 #ifdef __cplusplus
 }

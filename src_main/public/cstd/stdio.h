@@ -36,6 +36,6 @@ inline int _vsnprintf(char *buffer, size_t count, const char *format, va_list ar
 }
 #endif
 
-#endif // _WIN32
+#endif // !_WIN32
 
 #endif // CSTD_STDIO_H

@@ -43,6 +43,6 @@ inline int strnicmp(const char *string1, const char *string2, size_t count)
 }
 #endif
 
-#endif // _WIN32
+#endif // !_WIN32
 
 #endif // CSTD_STRING_H
