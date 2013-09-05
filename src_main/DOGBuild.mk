@@ -11,5 +11,5 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 	include $(CLEAR_VARS)
 	LOCAL_ARM_NEON := true
 	LOCAL_MODULE := $(DOG_PROJECT)_neon
-include DOGBuildCore.mk
+	include DOGBuildCore.mk
 endif
