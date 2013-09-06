@@ -4,8 +4,8 @@ Say "map testchmb_a_01" to the robots!
 2/3 of entire completed work will be uploaded here.
 ## Done
 ### Unreleased
-* mathlib includes for NEON.
+* tier0 edits.
 
 ### Released
-* tier0/platform.h for Android and ARM.
+* Common and public headers.
 * Build makefiles.

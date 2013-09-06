@@ -27,6 +27,9 @@
 #undef _XBOX
 #endif
 #define NO_STEAM
+#ifdef __ANDROID__
+#define NO_VOICE // D0GTODO: add voice
+#endif
 
 #include "wchartypes.h"
 #include "basetypes.h"
@@ -50,10 +53,10 @@
 #endif // __arm__
 
 #include <malloc.h>
-#include <new.h>
+#include <new>
 
 // need this for memset
-#include <string.h>
+#include <cstd/string.h>
 
 #ifdef _RETAIL
 #define IsRetail() true
@@ -294,7 +297,7 @@ typedef void * HINSTANCE;
 
 #elif _LINUX
 	#define DECL_ALIGN(x) __attribute__((aligned(x)))
-#elif
+#else
         #define DECL_ALIGN(x) /* */
 #endif
 
@@ -377,7 +380,11 @@ typedef void * HINSTANCE;
 	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE inline
-	#define  __stdcall			__attribute__ ((__stdcall__))
+	#if defined(__arm__)
+		#define __stdcall
+	#else
+		#define  __stdcall			__attribute__ ((__stdcall__))
+	#endif
 #endif
 
 // Force a function call site -not- to inlined. (useful for profiling)
