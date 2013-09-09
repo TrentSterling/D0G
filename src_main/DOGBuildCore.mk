@@ -8,7 +8,7 @@ ifeq ($(DOG_STATIC_LIBRARY), true)
 else
 	LOCAL_CFLAGS += -D_SHARED_LIB
 	LOCAL_LDFLAGS := -L"$(DOG_SRC_MAIN)/lib/$(TARGET_PLATFORM)/$(TARGET_ARCH_ABI)"
-	LOCAL_LDLIBS := $(DOG_LDLIBS)
+	LOCAL_LDLIBS := $(addprefix -l,$(DOG_LDLIBS))
 	ifeq ($(LOCAL_ARM_NEON), true)
 		LOCAL_STATIC_LIBRARIES := $(addsuffix _neon,$(DOG_STATIC_LIBRARIES))
 	else
