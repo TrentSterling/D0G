@@ -7,12 +7,12 @@ ifeq ($(DOG_STATIC_LIBRARY), true)
 	include $(BUILD_STATIC_LIBRARY)
 else
 	LOCAL_CFLAGS += -D_SHARED_LIB
-	LOCAL_LDFLAGS := -L"$(DOG_SRC_MAIN)/lib/android/$(TARGET_ARCH_ABI)" $(addprefix -l,$(DOG_LDLIBS))
+	LOCAL_LDFLAGS := -L"$(DOG_SRC_MAIN)/lib/android/$(TARGET_ARCH_ABI)"
+	LOCAL_LDLIBS := $(DOG_LDLIBS)
 	ifeq ($(LOCAL_ARM_NEON), true)
-		LOCAL_LDFLAGS += $(addprefix -l,$(addsuffix _neon,$(DOG_LDLIBS_PUBLIC)))
+		LOCAL_STATIC_LIBRARIES := $(addsuffix _neon,$(DOG_STATIC_LIBRARIES))
 	else
-		LOCAL_LDFLAGS += $(addprefix -l,$(DOG_LDLIBS_PUBLIC))
+		LOCAL_STATIC_LIBRARIES := $(DOG_STATIC_LIBRARIES)
 	endif
-	LOCAL_LDFLAGS += $(DOG_LDFLAGS)
 	include $(BUILD_SHARED_LIBRARY)
 endif
