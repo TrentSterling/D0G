@@ -118,9 +118,9 @@ inline void ThreadPause()
 {
 #if defined( _WIN32 ) && !defined( _X360 )
 	__asm pause;
+#elif defined( _X360 ) || defined(__arm__)
 #elif _LINUX
 	__asm __volatile("pause");
-#elif defined( _X360 ) || defined(__arm__)
 #else
 #error "implement me"
 #endif
