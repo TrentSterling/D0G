@@ -426,8 +426,8 @@ typedef void * HINSTANCE;
 #define RESTRICT __restrict
 #define RESTRICT_FUNC __declspec(restrict)
 #else
-#define RESTRICT
-#define RESTRICT_FUNC
+#define RESTRICT __restrict__
+#define RESTRICT_FUNC __restrict__
 #endif
 
 
