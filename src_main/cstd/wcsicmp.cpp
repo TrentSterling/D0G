@@ -7,7 +7,7 @@
 //
 //===========================================================================//
 
-#include <wchar.h>
+#include <cstd/wchar.h>
 
 extern "C" int _wcsicmp(const wchar_t *string1, const wchar_t *string2)
 {
