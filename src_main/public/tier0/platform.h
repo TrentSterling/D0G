@@ -45,6 +45,7 @@
 #ifdef _LINUX
 // need this for _alloca
 #include <alloca.h>
+#define _alloca alloca
 #endif // _LINUX
 
 #ifdef __arm__
