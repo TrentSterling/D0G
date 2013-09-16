@@ -96,7 +96,7 @@ inline wchar_t          *d0g_wcschr(const wchar_t *wcs, wchar_t wc)
 	{
 		if (*wcs == wc)
 			return (wchar_t *)(wcs);
-	} while (*(wcs++))
+	} while (*(wcs++));
 	return 0;
 }
 #define                      wcschr d0g_wcschr

@@ -75,7 +75,7 @@ last_chars:
 		*(++dest) = c;
 		if (!(--n))
 			return s;
-	} while (с);
+	} while (c);
 zero_fill:
 	do
 		*(++dest) = 0;

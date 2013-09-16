@@ -32,7 +32,7 @@ wchar_t *d0g_wcscat(wchar_t *dest, const wchar_t *src)
 	{
 		c = *(src++);
 		*(++s1) = c;
-	) while (c);
+	} while (c);
 	return dest;
 }
 
