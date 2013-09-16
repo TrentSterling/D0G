@@ -18,35 +18,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-#ifndef CSTD_STDIO_H
-#define CSTD_STDIO_H
-
-#include <stdio.h>
-
-#ifndef _WIN32
+#include <alloca.h>
 #include <stdarg.h>
+#include <cstd/stdio.h>
+#include <cstd/wchar.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// THIS IS AN AWFUL HACK FOR ASCII ONLY - DO NOT USE WIDE STRINGS IN FORMATS!!!
+// REPLACE WIDE STRING FORMATTING WITH WCSCPY/WCSCAT ON SIGHT!!!
 
-inline int _snprintf(char *buffer, size_t count, const char *format, ...)
+int d0g_vswprintf(wchar_t *s, size_t n, const wchar_t *format, va_list args)
+{
+	if (!n)
+		return 0;
+	size_t size = d0g_wcstombs(NULL, format, 0);
+	if (!size)
+	{
+		s[0] = 0;
+		return 0;
+	}
+	char *mbs = (char *)(alloca(size + 1));
+	d0g_wcstombs(mbs, format, size + 1);
+	char *c = (char *)s;
+	int ret = vsnprintf(c, n, mbs, args);
+	if (ret < 0)
+		return ret;
+	int i = ret;
+	while (i--)
+		s[i] = c[i];
+	if (ret < n)
+		s[ret] = 0;
+	return ret;
+}
+
+int d0g_swprintf(wchar_t *s, size_t n, const wchar_t *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);
-	vsnprintf(buffer, count, format, argptr);
+	int ret = d0g_vswprintf(s, n, format, argptr);
 	va_end(argptr);
+	return ret;
 }
-
-inline int _vsnprintf(char *buffer, size_t count, const char *format, va_list argptr)
-{
-	vsnprintf(buffer, count, format, argptr);
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // !_WIN32
-
-#endif // CSTD_STDIO_H
