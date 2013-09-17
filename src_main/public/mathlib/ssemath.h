@@ -171,7 +171,7 @@ extern const ALIGN16 int32 g_SIMD_signmask[];				// 0x80000000 x 4
 extern const ALIGN16 int32 g_SIMD_lsbmask[];				// 0xfffffffe x 4
 extern const ALIGN16 int32 g_SIMD_clear_wmask[];			// -1 -1 -1 0
 extern const ALIGN16 int32 g_SIMD_ComponentMask[4][4];		// [0xFFFFFFFF 0 0 0], [0 0xFFFFFFFF 0 0], [0 0 0xFFFFFFFF 0], [0 0 0 0xFFFFFFFF]
-#ifdef __ARM_NEON___
+#ifdef __ARM_NEON__
 extern const u32x4 g_SIMD_clear_signmask_NEON;
 extern const u32x4 g_SIMD_signmask_NEON;
 extern const u32x4 g_SIMD_lsbmask_NEON;
@@ -1906,7 +1906,7 @@ FORCEINLINE fltx4 ClampVectorSIMD(const fltx4 &in, const fltx4 &min, const fltx4
 // Almost the same speed as SISD, but probably blends with other functions better
 FORCEINLINE void TransposeSIMD(fltx4 &x, fltx4 &y, fltx4 &z, fltx4 &w)
 {
-	__asm__ (
+	__asm__ __volatile__ (
 		"vzip.f32 %q0, %q1\n"
 		"vzip.f32 %q2, %q3\n"
 		"vswp %f0, %e2\n"

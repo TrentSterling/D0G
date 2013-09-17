@@ -155,7 +155,7 @@ public:
 #if defined(__arm__)
 #if defined(__ARM_NEON__)
 	inline float32x4_t &AsM128() {return *((float32x4_t *)(&x));}
-	inline const float32x4_t &AsM128() {return *((const float32x4_t *)(&x));}
+	inline const float32x4_t &AsM128() const {return *((const float32x4_t *)(&x));}
 #endif
 #elif defined(_X360)
 	inline __vector4 &AsM128() {return *((__vector4 *)(&x));}
@@ -641,7 +641,6 @@ inline void Vector4DAligned::InitZero( void )
 #else
 	x = y = z = w = 0.0f;
 #endif
-#else
 #elif defined( _X360 )
 	this->AsM128() = __vspltisw( 0 );
 #else
@@ -655,7 +654,7 @@ inline void Vector4DMultiplyAligned( Vector4DAligned const& a, Vector4DAligned c
 	Assert( a.IsValid() && b.IsValid() );
 #if defined(__ARM_NEON__)
 	c.AsM128() = vmulq_f32(a.AsM128(), b.AsM128());
-#elseif defined( _X360 )
+#elif defined( _X360 )
 	c.AsM128() = __vmulfp( a.AsM128(), b.AsM128() );
 #else
 	c.x = a.x * b.x;
@@ -699,7 +698,7 @@ inline void Vector4DWeightMADSSE( vec_t w, Vector4DAligned const& vInA, Vector4D
 #if defined(__arm__) || defined(_X360)
 	Vector4DWeightMAD(w, vInA, vOutA, vInB, vOutB);
 	return;
-#endif
+#else
 	Assert( vInA.IsValid() && vInB.IsValid() && IsFinite(w) );
 
 	// Replicate scalar float out to 4 components
@@ -708,6 +707,7 @@ inline void Vector4DWeightMADSSE( vec_t w, Vector4DAligned const& vInA, Vector4D
 	// 4D SSE Vector MAD
 	vOutA.AsM128() = _mm_add_ps( vOutA.AsM128(), _mm_mul_ps( vInA.AsM128(), packed ) );
 	vOutB.AsM128() = _mm_add_ps( vOutB.AsM128(), _mm_mul_ps( vInB.AsM128(), packed ) );
+#endif
 }
 
 #endif // VECTOR4D_H
