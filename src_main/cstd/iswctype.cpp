@@ -20,7 +20,7 @@ THE SOFTWARE. */
 
 #include <cstd/wchar.h>
 
-int d0g_iswcntrl(wint_t c)
+int d0g_iswcntrl(wchar_t c)
 {
 	return (c <= 0x1f) ||
 		((unsigned int)(c - 0x7f) <= 0x20) ||
@@ -29,7 +29,7 @@ int d0g_iswcntrl(wint_t c)
 		((unsigned int)(c - 0xfff9) <= 0x2);
 }
 
-int d0g_iswdigit(wint_t c)
+int d0g_iswdigit(wchar_t c)
 {
 	if ((c == 0xb2) || (c == 0xb3) || (c == 0xb9))
 		return 1;
@@ -49,7 +49,7 @@ int d0g_iswdigit(wint_t c)
 	return check09 && (ranges09[(c - 0x66) >> 5] & (1 << ((c - 6) & 31)));
 }
 
-int d0g_iswspace(wint_t c)
+int d0g_iswspace(wchar_t c)
 {
 	return ((unsigned int)(c - 0x9) <= 0x4) ||
 		(c == 0x20) || (c == 0xa0) ||
@@ -59,7 +59,7 @@ int d0g_iswspace(wint_t c)
 		(c == 0x205f) || (c == 0x3000);
 }
 
-int d0g_iswxdigit(wint_t c)
+int d0g_iswxdigit(wchar_t c)
 {
 	return ((unsigned int)(c - L'0') < 10) || ((unsigned int)((c | 0x20) - L'a') < 6);
 }

@@ -23,7 +23,8 @@
 // For rand(). We really need a library!
 #include <stdlib.h>
 
-#if !(defined(_X360) || defined(__arm__))
+#define USE_M64S ( ( !defined( _X360 ) ) && ( ! defined( _LINUX) ) )
+#if USE_M64S
 // For MMX intrinsics
 #include <xmmintrin.h>
 #endif
@@ -204,7 +205,6 @@ private:
 
 
 
-#define USE_M64S ( ( !defined( _X360 ) ) && ( ! defined( _LINUX) ) )
 
 
 

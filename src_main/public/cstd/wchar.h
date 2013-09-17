@@ -26,15 +26,15 @@ THE SOFTWARE. */
 // be located in stdlib, so if they are used, cstd/wchar must be included
 // AFTER stdlib.
 
-#if !defined(CSTD_WCHAR_H)
+#ifndef CSTD_WCHAR_H
 #define CSTD_WCHAR_H
 
-#if defined(_WIN32)
+#ifdef _WIN32
 #include <wchar.h>
 #include <wctype.h>
 #else
 
-#if !defined(_WCHAR_H_)
+#ifndef _WCHAR_H_
 #define _WCHAR_H_
 #endif
 
@@ -43,29 +43,35 @@ THE SOFTWARE. */
 #include <stddef.h>
 #include <time.h>
 
-typedef unsigned short wint_t;
+#ifdef wint_t
+#undef wint_t
+#endif
+#define wint_t wchar_t
 
-#if defined(WINT_MAX)
+#ifdef WINT_MAX
 #undef WINT_MAX
 #endif
-#if defined(WINT_MIN)
+#ifdef WINT_MIN
 #undef WINT_MIN
 #endif
-#define WINT_MAX ((wint_t)(0xffff))
-#define WINT_MIN ((wint_t)(0))
+#define WINT_MAX ((wchar_t)(0xffff))
+#define WINT_MIN ((wchar_t)(0))
 
-#define WEOF ((wint_t)(0xffff))
+#ifdef WEOF
+#undef WEOF
+#endif
+#define WEOF ((wchar_t)(0xffff))
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 extern "C" {
 #endif
-extern int               d0g_iswcntrl(wint_t);
+extern int               d0g_iswcntrl(wchar_t);
 #define                      iswcntrl d0g_iswcntrl
-extern int               d0g_iswdigit(wint_t);
+extern int               d0g_iswdigit(wchar_t);
 #define                      iswdigit d0g_iswdigit
-extern int               d0g_iswspace(wint_t);
+extern int               d0g_iswspace(wchar_t);
 #define                      iswspace d0g_iswspace
-extern int               d0g_iswxdigit(wint_t);
+extern int               d0g_iswxdigit(wchar_t);
 #define                      iswxdigit d0g_iswxdigit
 
 extern size_t            d0g_mbstowcs(wchar_t *, const char *, size_t);
@@ -75,9 +81,9 @@ extern size_t            d0g_mbstowcs(wchar_t *, const char *, size_t);
 extern int               d0g_swprintf(wchar_t *, size_t, const wchar_t *, ...);
 #define                      swprintf d0g_swprintf
 #define                    _snwprintf d0g_swprintf
-extern wint_t            d0g_towlower(wint_t);
+extern wchar_t           d0g_towlower(wchar_t);
 #define                      towlower d0g_towlower
-extern wint_t            d0g_towupper(wint_t);
+extern wchar_t           d0g_towupper(wchar_t);
 #define                      towupper d0g_towupper
 // THIS IS AN AWFUL HACK!!! READ SWPRINTF COMMENT!!!
 extern int               d0g_vswprintf(wchar_t *, size_t, const wchar_t *, va_list);
@@ -125,7 +131,7 @@ extern double            d0g_wcstod(const wchar_t *, wchar_t **);
 #define                      wcstod d0g_wcstod
 extern size_t            d0g_wcstombs(char *, const wchar_t *, size_t);
 #define                      wcstombs d0g_wcstombs
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 

@@ -646,7 +646,7 @@ inline T DWordSwapC( T dw )
 template <typename T>
 inline T WordSwapARM(T w)
 {
-	__asm__ (
+	__asm__ __volatile__ (
 		"rev16 %r0, %r0\n"
 		: "+r" (w)
 	);
@@ -656,7 +656,7 @@ inline T WordSwapARM(T w)
 template <typename T>
 inline T DWordSwapARM(T w)
 {
-	__asm__ (
+	__asm__ __volatile__ (
 		"rev %r0, %r0\n"
 		: "+r" (w)
 	);
@@ -722,7 +722,7 @@ inline T DWordSwapAsm( T dw )
 template <typename T>
 inline T WordSwapAsm(T w)
 {
-	__asm__ (
+	__asm__ __volatile__ (
 		"xchg %b0, %h0\n"
 		: "+r" (w)
 	);
@@ -732,7 +732,7 @@ inline T WordSwapAsm(T w)
 template <typename T>
 inline T DWordSwapAsm(T dw)
 {
-	__asm__ (
+	__asm__ __volatile__ (
 		"bswap %0\n"
 		: "+r" (dw)
 	);

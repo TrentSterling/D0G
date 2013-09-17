@@ -26,7 +26,7 @@
 
 int d0g_wcscasecmp(const wchar_t *s1, const wchar_t *s2)
 {
-	wint_t c1, c2;
+	wchar_t c1, c2;
 	if (s1 == s2)
 		return 0;
 	do
@@ -41,7 +41,7 @@ int d0g_wcscasecmp(const wchar_t *s1, const wchar_t *s2)
 
 int d0g_wcsncasecmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
-	wint_t c1, c2;
+	wchar_t c1, c2;
 	if ((s1 == s2) || !n)
 		return 0;
 	do

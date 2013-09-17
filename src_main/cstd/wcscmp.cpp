@@ -20,7 +20,7 @@
 
 #include <cstd/wchar.h>
 
-int d0g_wcscmp(const char *s1, const char *s2)
+int d0g_wcscmp(const wchar_t *s1, const wchar_t *s2)
 {
 	wchar_t c1, c2;
 	do
@@ -33,28 +33,28 @@ int d0g_wcscmp(const char *s1, const char *s2)
 	return c1 < c2 ? -1 : 1;
 }
 
-int d0g_wcsncmp(const char *s1, const char *s2, size_t n)
+int d0g_wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
-	wint_t c1 = 0, c2 = 0;
+	wchar_t c1 = 0, c2 = 0;
 	if (n >= 4)
 	{
 		size_t n4 = n >> 2;
 		do
 		{
-			c1 = (wint_t)(*(s1++));
-			c2 = (wint_t)(*(s2++));
+			c1 = *(s1++);
+			c2 = *(s2++);
 			if (!c1 || (c1 != c2))
 				return c1 - c2;
-			c1 = (wint_t)(*(s1++));
-			c2 = (wint_t)(*(s2++));
+			c1 = *(s1++);
+			c2 = *(s2++);
 			if (!c1 || (c1 != c2))
 				return c1 - c2;
-			c1 = (wint_t)(*(s1++));
-			c2 = (wint_t)(*(s2++));
+			c1 = *(s1++);
+			c2 = *(s2++);
 			if (!c1 || (c1 != c2))
 				return c1 - c2;
-			c1 = (wint_t)(*(s1++));
-			c2 = (wint_t)(*(s2++));
+			c1 = *(s1++);
+			c2 = *(s2++);
 			if (!c1 || (c1 != c2))
 				return c1 - c2;
 		} while (--n4 > 0);
@@ -62,8 +62,8 @@ int d0g_wcsncmp(const char *s1, const char *s2, size_t n)
 	}
 	while (n > 0)
 	{
-		c1 = (wint_t)(*(s1++));
-		c2 = (wint_t)(*(s2++));
+		c1 = *(s1++);
+		c2 = *(s2++);
 		if (!c1 || (c1 != c2))
 			return c1 - c2;
 		--n;

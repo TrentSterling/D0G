@@ -22,9 +22,9 @@ THE SOFTWARE. */
 
 typedef struct
 {
-	wint_t start;
-	wint_t length;
-	const wint_t *remap;
+	wchar_t start;
+	wchar_t length;
+	const wchar_t *remap;
 } d0g_towlu_range;
 
 // UCS-2 level-1 mapping tables. Placed in descending order by probability
@@ -35,14 +35,14 @@ typedef struct
 // Latin
 #define D0G_TOWLOWER_RANGE_0_START 192
 #define D0G_TOWLOWER_RANGE_0_LENGTH 31
-const wint_t d0g_towlower_range0[] = {
+const wchar_t d0g_towlower_range0[] = {
 	224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
 	240, 241, 242, 243, 244, 245, 246, 215, 248, 249, 250, 251, 252, 253, 254
 };
 // Latin
 #define D0G_TOWLOWER_RANGE_1_START 256
 #define D0G_TOWLOWER_RANGE_1_LENGTH 279
-const wint_t d0g_towlower_range1[] = {
+const wchar_t d0g_towlower_range1[] = {
 	257, 257, 259, 259, 261, 261, 263, 263, 265, 265, 267, 267, 269, 269, 271, 271,
 	273, 273, 275, 275, 277, 277, 279, 279, 281, 281, 283, 283, 285, 285, 287, 287,
 	289, 289, 291, 291, 293, 293, 295, 295, 297, 297, 299, 299, 301, 301, 303, 303,
@@ -65,7 +65,7 @@ const wint_t d0g_towlower_range1[] = {
 // Latin, Greek
 #define D0G_TOWLOWER_RANGE_2_START 7680
 #define D0G_TOWLOWER_RANGE_2_LENGTH 490
-const wint_t d0g_towlower_range2[] = {
+const wchar_t d0g_towlower_range2[] = {
 	7681, 7681, 7683, 7683, 7685, 7685, 7687, 7687, 7689, 7689, 7691, 7691, 7693, 7693, 7695, 7695,
 	7697, 7697, 7699, 7699, 7701, 7701, 7703, 7703, 7705, 7705, 7707, 7707, 7709, 7709, 7711, 7711,
 	7713, 7713, 7715, 7715, 7717, 7717, 7719, 7719, 7721, 7721, 7723, 7723, 7725, 7725, 7727, 7727,
@@ -101,7 +101,7 @@ const wint_t d0g_towlower_range2[] = {
 // Cyrillic
 #define D0G_TOWLOWER_RANGE_3_START 1025
 #define D0G_TOWLOWER_RANGE_3_LENGTH 47
-const wint_t d0g_towlower_range3[] = {
+const wchar_t d0g_towlower_range3[] = {
 	1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1037, 1118, 1119, 1072,
 	1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088,
 	1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103
@@ -109,7 +109,7 @@ const wint_t d0g_towlower_range3[] = {
 // Cyrillic
 #define D0G_TOWLOWER_RANGE_4_START 1120
 #define D0G_TOWLOWER_RANGE_4_LENGTH 153
-const wint_t d0g_towlower_range4[] = {
+const wchar_t d0g_towlower_range4[] = {
 	1121, 1121, 1123, 1123, 1125, 1125, 1127, 1127, 1129, 1129, 1131, 1131, 1133, 1133, 1135, 1135,
 	1137, 1137, 1139, 1139, 1141, 1141, 1143, 1143, 1145, 1145, 1147, 1147, 1149, 1149, 1151, 1151,
 	1153, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167,
@@ -124,7 +124,7 @@ const wint_t d0g_towlower_range4[] = {
 // Greek
 #define D0G_TOWLOWER_RANGE_5_START 902
 #define D0G_TOWLOWER_RANGE_5_LENGTH 38
-const wint_t d0g_towlower_range5[] = {
+const wchar_t d0g_towlower_range5[] = {
 	940, 903, 941, 942, 943, 907, 972, 909, 973, 974, 912, 945, 946, 947, 948, 949,
 	950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 930, 963, 964, 965,
 	966, 967, 968, 969, 970, 971
@@ -132,7 +132,7 @@ const wint_t d0g_towlower_range5[] = {
 // Armenian
 #define D0G_TOWLOWER_RANGE_6_START 1329
 #define D0G_TOWLOWER_RANGE_6_LENGTH 38
-const wint_t d0g_towlower_range6[] = {
+const wchar_t d0g_towlower_range6[] = {
 	1377, 1378, 1379, 1380, 1381, 1382, 1383, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392,
 	1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1408,
 	1409, 1410, 1411, 1412, 1413, 1414
@@ -140,7 +140,7 @@ const wint_t d0g_towlower_range6[] = {
 // Georgian
 #define D0G_TOWLOWER_RANGE_7_START 4256
 #define D0G_TOWLOWER_RANGE_7_LENGTH 38
-const wint_t d0g_towlower_range7[] = {
+const wchar_t d0g_towlower_range7[] = {
 	4304, 4305, 4306, 4307, 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319,
 	4320, 4321, 4322, 4323, 4324, 4325, 4326, 4327, 4328, 4329, 4330, 4331, 4332, 4333, 4334, 4335,
 	4336, 4337, 4338, 4339, 4340, 4341
@@ -148,21 +148,21 @@ const wint_t d0g_towlower_range7[] = {
 // Circled Latin
 #define D0G_TOWLOWER_RANGE_8_START 9398
 #define D0G_TOWLOWER_RANGE_8_LENGTH 26
-const wint_t d0g_towlower_range8[] = {
+const wchar_t d0g_towlower_range8[] = {
 	9424, 9425, 9426, 9427, 9428, 9429, 9430, 9431, 9432, 9433, 9434, 9435, 9436, 9437, 9438, 9439,
 	9440, 9441, 9442, 9443, 9444, 9445, 9446, 9447, 9448, 9449
 };
 // Fullwidth Latin
 #define D0G_TOWLOWER_RANGE_9_START 65313
 #define D0G_TOWLOWER_RANGE_9_LENGTH 26
-const wint_t d0g_towlower_range9[] = {
+const wchar_t d0g_towlower_range9[] = {
 	65345, 65346, 65347, 65348, 65349, 65350, 65351, 65352, 65353, 65354, 65355, 65356, 65357, 65358, 65359, 65360,
 	65361, 65362, 65363, 65364, 65365, 65366, 65367, 65368, 65369, 65370
 };
 // Coptic
 #define D0G_TOWLOWER_RANGE_10_START 994
 #define D0G_TOWLOWER_RANGE_10_LENGTH 13
-const wint_t d0g_towlower_range10[] = {
+const wchar_t d0g_towlower_range10[] = {
 	995, 995, 997, 997, 999, 999, 1001, 1001, 1003, 1003, 1005, 1005, 1007
 };
 const d0g_towlu_range d0g_towlower_ranges[D0G_TOWLOWER_RANGES] = {
@@ -183,7 +183,7 @@ const d0g_towlu_range d0g_towlower_ranges[D0G_TOWLOWER_RANGES] = {
 // Latin
 #define D0G_TOWUPPER_RANGE_0_START 224
 #define D0G_TOWUPPER_RANGE_0_LENGTH 312
-const wint_t d0g_towupper_range0[] = {
+const wchar_t d0g_towupper_range0[] = {
 	192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
 	208, 209, 210, 211, 212, 213, 214, 247, 216, 217, 218, 219, 220, 221, 222, 376,
 	256, 256, 258, 258, 260, 260, 262, 262, 264, 264, 266, 266, 268, 268, 270, 270,
@@ -208,7 +208,7 @@ const wint_t d0g_towupper_range0[] = {
 // Latin
 #define D0G_TOWUPPER_RANGE_1_START 595
 #define D0G_TOWUPPER_RANGE_1_LENGTH 64
-const wint_t d0g_towupper_range1[] = {
+const wchar_t d0g_towupper_range1[] = {
 	385, 390, 597, 598, 394, 398, 399, 602, 400, 604, 605, 606, 607, 403, 609, 610,
 	404, 612, 613, 614, 615, 407, 406, 618, 619, 620, 621, 622, 412, 624, 625, 413,
 	627, 628, 415, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642,
@@ -217,7 +217,7 @@ const wint_t d0g_towupper_range1[] = {
 // Latin, Greek
 #define D0G_TOWUPPER_RANGE_2_START 7681
 #define D0G_TOWUPPER_RANGE_2_LENGTH 481
-const wint_t d0g_towupper_range2[] = {
+const wchar_t d0g_towupper_range2[] = {
 	7680, 7682, 7682, 7684, 7684, 7686, 7686, 7688, 7688, 7690, 7690, 7692, 7692, 7694, 7694, 7696,
 	7696, 7698, 7698, 7700, 7700, 7702, 7702, 7704, 7704, 7706, 7706, 7708, 7708, 7710, 7710, 7712,
 	7712, 7714, 7714, 7716, 7716, 7718, 7718, 7720, 7720, 7722, 7722, 7724, 7724, 7726, 7726, 7728,
@@ -253,7 +253,7 @@ const wint_t d0g_towupper_range2[] = {
 // Cyrillic
 #define D0G_TOWUPPER_RANGE_3_START 1072
 #define D0G_TOWUPPER_RANGE_3_LENGTH 202
-const wint_t d0g_towupper_range3[] = {
+const wchar_t d0g_towupper_range3[] = {
 	1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055,
 	1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071,
 	1104, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1117, 1038, 1039,
@@ -271,7 +271,7 @@ const wint_t d0g_towupper_range3[] = {
 // Greek
 #define D0G_TOWUPPER_RANGE_4_START 940
 #define D0G_TOWUPPER_RANGE_4_LENGTH 35
-const wint_t d0g_towupper_range4[] = {
+const wchar_t d0g_towupper_range4[] = {
 	902, 904, 905, 906, 944, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923,
 	924, 925, 926, 927, 928, 929, 962, 931, 932, 933, 934, 935, 936, 937, 938, 939,
 	908, 910, 911
@@ -279,7 +279,7 @@ const wint_t d0g_towupper_range4[] = {
 // Armenian
 #define D0G_TOWUPPER_RANGE_5_START 1377
 #define D0G_TOWUPPER_RANGE_5_LENGTH 38
-const wint_t d0g_towupper_range5[] = {
+const wchar_t d0g_towupper_range5[] = {
 	1329, 1330, 1331, 1332, 1333, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344,
 	1345, 1346, 1347, 1348, 1349, 1350, 1351, 1352, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360,
 	1361, 1362, 1363, 1364, 1365, 1366
@@ -287,7 +287,7 @@ const wint_t d0g_towupper_range5[] = {
 // Georgian
 #define D0G_TOWUPPER_RANGE_6_START 4304
 #define D0G_TOWUPPER_RANGE_6_LENGTH 38
-const wint_t d0g_towupper_range6[] = {
+const wchar_t d0g_towupper_range6[] = {
 	4256, 4257, 4258, 4259, 4260, 4261, 4262, 4263, 4264, 4265, 4266, 4267, 4268, 4269, 4270, 4271,
 	4272, 4273, 4274, 4275, 4276, 4277, 4278, 4279, 4280, 4281, 4282, 4283, 4284, 4285, 4286, 4287,
 	4288, 4289, 4290, 4291, 4292, 4293
@@ -295,21 +295,21 @@ const wint_t d0g_towupper_range6[] = {
 // Circled Latin
 #define D0G_TOWUPPER_RANGE_7_START 9424
 #define D0G_TOWUPPER_RANGE_7_LENGTH 26
-const wint_t d0g_towupper_range7[] = {
+const wchar_t d0g_towupper_range7[] = {
 	9398, 9399, 9400, 9401, 9402, 9403, 9404, 9405, 9406, 9407, 9408, 9409, 9410, 9411, 9412, 9413,
 	9414, 9415, 9416, 9417, 9418, 9419, 9420, 9421, 9422, 9423
 };
 // Fullwidth Latin
 #define D0G_TOWUPPER_RANGE_8_START 65345
 #define D0G_TOWUPPER_RANGE_8_LENGTH 26
-const wint_t d0g_towupper_range8[] = {
+const wchar_t d0g_towupper_range8[] = {
 	65313, 65314, 65315, 65316, 65317, 65318, 65319, 65320, 65321, 65322, 65323, 65324, 65325, 65326, 65327, 65328,
 	65329, 65330, 65331, 65332, 65333, 65334, 65335, 65336, 65337, 65338
 };
 // Coptic
 #define D0G_TOWUPPER_RANGE_9_START 995
 #define D0G_TOWUPPER_RANGE_9_LENGTH 13
-const wint_t d0g_towupper_range9[] = {
+const wchar_t d0g_towupper_range9[] = {
 	994, 996, 996, 998, 998, 1000, 1000, 1002, 1002, 1004, 1004, 1006, 1006
 };
 const d0g_towlu_range d0g_towupper_ranges[D0G_TOWUPPER_RANGES] = {
@@ -325,7 +325,7 @@ const d0g_towlu_range d0g_towupper_ranges[D0G_TOWUPPER_RANGES] = {
 	{D0G_TOWUPPER_RANGE_9_START, D0G_TOWUPPER_RANGE_9_LENGTH, d0g_towupper_range9},
 };
 
-wint_t d0g_towlower(wint_t c)
+wchar_t d0g_towlower(wchar_t c)
 {
 	if (!(c & 0xff80))
 	{
@@ -345,7 +345,7 @@ wint_t d0g_towlower(wint_t c)
 	return c;
 }
 
-wint_t d0g_towupper(wint_t c)
+wchar_t d0g_towupper(wchar_t c)
 {
 	if (!(c & 0xff80))
 	{
