@@ -85,7 +85,13 @@ typedef unsigned long ThreadId_t;
 // in that it accepts a standard C function rather than compiler specific one.
 //
 //-----------------------------------------------------------------------------
+#ifdef _WIN32
 FORWARD_DECLARE_HANDLE( ThreadHandle_t );
+#define THREAD_NULL_HANDLE (NULL)
+#else
+typedef pthread_t ThreadHandle_t;
+#define THREAD_NULL_HANDLE ((pthread_t)0)
+#endif
 typedef unsigned (*ThreadFunc_t)( void *pParam );
 
 TT_OVERLOAD ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, ThreadId_t *pID, unsigned stackSize = 0 );
@@ -98,9 +104,9 @@ TT_INTERFACE bool ReleaseThreadHandle( ThreadHandle_t );
 TT_INTERFACE void ThreadSleep(unsigned duration = 0);
 TT_INTERFACE uint ThreadGetCurrentId();
 TT_INTERFACE ThreadHandle_t ThreadGetCurrentHandle();
-TT_INTERFACE int ThreadGetPriority( ThreadHandle_t hThread = NULL );
+TT_INTERFACE int ThreadGetPriority( ThreadHandle_t hThread = THREAD_NULL_HANDLE );
 TT_INTERFACE bool ThreadSetPriority( ThreadHandle_t hThread, int priority );
-inline		 bool ThreadSetPriority( int priority ) { return ThreadSetPriority( NULL, priority ); }
+inline		 bool ThreadSetPriority( int priority ) { return ThreadSetPriority( THREAD_NULL_HANDLE, priority ); }
 TT_INTERFACE bool ThreadInMainThread();
 TT_INTERFACE void DeclareCurrentThreadIsMainThread();
 
@@ -308,14 +314,14 @@ template <class T = int>
 class CThreadLocalInt : public CThreadLocal<T>
 {
 public:
-	operator const T() const { return Get(); }
+	operator const T() const { return this->Get(); }
 	int	operator=( T i ) { Set( i ); return i; }
 
-	T operator++()					{ T i = Get(); Set( ++i ); return i; }
-	T operator++(int)				{ T i = Get(); Set( i + 1 ); return i; }
+	T operator++()					{ T i = this->Get(); Set( ++i ); return i; }
+	T operator++(int)				{ T i = this->Get(); Set( i + 1 ); return i; }
 
-	T operator--()					{ T i = Get(); Set( --i ); return i; }
-	T operator--(int)				{ T i = Get(); Set( i - 1 ); return i; }
+	T operator--()					{ T i = this->Get(); Set( --i ); return i; }
+	T operator--(int)				{ T i = this->Get(); Set( i - 1 ); return i; }
 };
 
 //---------------------------------------------------------
@@ -1120,7 +1126,11 @@ protected:
 #endif
 
 	// "Virtual static" facility
-	typedef unsigned (__stdcall *ThreadProc_t)( void * );
+#ifdef _WIN32
+	typedef unsigned (__stdcall *ThreadProc_t)(void *);
+#else
+	typedef void *(*ThreadProc_t)(void *);
+#endif
 	virtual ThreadProc_t GetThreadProc();
 
 	CThreadMutex m_Lock;
@@ -1142,7 +1152,11 @@ private:
 		bool *        pfInitSuccess;
 	};
 
-	static unsigned __stdcall ThreadProc( void * pv );
+#ifdef _WIN32
+	static unsigned __stdcall ThreadProc(void *pv);
+#else
+	static void *ThreadProc(void *pv);
+#endif
 
 	// make copy constructor and assignment operator inaccessible
 	CThread( const CThread & );
