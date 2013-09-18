@@ -267,7 +267,29 @@ inline void VectorNegate(vec_t *a)
 #define VECTOR_COPY( A, B ) do { (B)[0] = (A)[0]; (B)[1] = (A)[1]; (B)[2]=(A)[2]; } while(0)
 #define DOT_PRODUCT( A, B ) ( (A)[0]*(B)[0] + (A)[1]*(B)[1] + (A)[2]*(B)[2] )
 
-// VectorMA moved to vector.h (included from here) due to compiler warning.
+FORCEINLINE void VectorMAInline( const float* start, float scale, const float* direction, float* dest )
+{
+	dest[0]=start[0]+direction[0]*scale;
+	dest[1]=start[1]+direction[1]*scale;
+	dest[2]=start[2]+direction[2]*scale;
+}
+
+FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
+{
+	dest.x=start.x+direction.x*scale;
+	dest.y=start.y+direction.y*scale;
+	dest.z=start.z+direction.z*scale;
+}
+
+FORCEINLINE void VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest )
+{
+	VectorMAInline(start, scale, direction, dest);
+}
+
+FORCEINLINE void VectorMA( const float * start, float scale, const float *direction, float *dest )
+{
+	VectorMAInline(start, scale, direction, dest);
+}
 
 
 int VectorCompare (const float *v1, const float *v2);

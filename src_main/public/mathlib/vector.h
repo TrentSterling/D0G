@@ -1116,31 +1116,6 @@ inline void VectorLerp(const Vector& src1, const Vector& src2, vec_t t, Vector& 
 	dest.z = src1.z + (src2.z - src1.z) * t;
 }
 
-// Moved from mathlib.h
-FORCEINLINE void VectorMAInline( const float* start, float scale, const float* direction, float* dest )
-{
-	dest[0]=start[0]+direction[0]*scale;
-	dest[1]=start[1]+direction[1]*scale;
-	dest[2]=start[2]+direction[2]*scale;
-}
-
-FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
-{
-	dest.x=start.x+direction.x*scale;
-	dest.y=start.y+direction.y*scale;
-	dest.z=start.z+direction.z*scale;
-}
-
-FORCEINLINE void VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest )
-{
-	VectorMAInline(start, scale, direction, dest);
-}
-
-FORCEINLINE void VectorMA( const float * start, float scale, const float *direction, float *dest )
-{
-	VectorMAInline(start, scale, direction, dest);
-}
-
 
 //-----------------------------------------------------------------------------
 // Temporary storage for vector results so const Vector& results can be returned

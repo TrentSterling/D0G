@@ -12,15 +12,15 @@
 
 #include "tier0/platform.h"
 
-#include <cstd/string.h>
-#include <stdlib.h>
 #ifdef _WIN32
 #pragma once
 #elif _LINUX
 #include <ctype.h>
-#include <math.h>
 #include <cstd/wchar.h>
 #endif
+
+#include <cstd/string.h>
+#include <stdlib.h>
 
 template< class T, class I > class CUtlMemory;
 template< class T, class A > class CUtlVector;

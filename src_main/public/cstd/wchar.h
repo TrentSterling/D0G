@@ -78,24 +78,17 @@ extern size_t            d0g_mbstowcs(wchar_t *, const char *, size_t);
 #define                      mbstowcs d0g_mbstowcs
 // THIS IS AN AWFUL HACK FOR ASCII ONLY - DO NOT USE WIDE STRINGS IN FORMATS!!!
 // REPLACE WIDE STRING FORMATTING WITH WCSCPY/WCSCAT ON SIGHT!!!
-extern int               d0g_snwprintf(wchar_t *, size_t, const wchar_t *, ...);
-#define                      snwprintf d0g_snwprintf
-#define                     _snwprintf d0g_snwprintf
-extern int               d0g_swprintf(wchar_t *, const wchar_t *, ...);
+extern int               d0g_swprintf(wchar_t *, size_t, const wchar_t *, ...);
 #define                      swprintf d0g_swprintf
-#define                     _swprintf d0g_swprintf
+#define                    _snwprintf d0g_swprintf
 extern wchar_t           d0g_towlower(wchar_t);
 #define                      towlower d0g_towlower
 extern wchar_t           d0g_towupper(wchar_t);
 #define                      towupper d0g_towupper
 // THIS IS AN AWFUL HACK!!! READ SWPRINTF COMMENT!!!
-extern int               d0g_vsnwprintf(wchar_t *, size_t, const wchar_t *, va_list);
-#define                      vsnwprintf d0g_vsnwprintf
-#define                     _vsnwprintf d0g_vsnwprintf
-// THIS IS AN AWFUL HACK!!! READ SWPRINTF COMMENT!!!
-extern int               d0g_vswprintf(wchar_t *, const wchar_t *, va_list);
+extern int               d0g_vswprintf(wchar_t *, size_t, const wchar_t *, va_list);
 #define                      vswprintf d0g_vswprintf
-#define                     _vswprintf d0g_vswprintf
+#define                    _vswnprintf d0g_vswprintf
 
 extern wchar_t          *d0g_wcscat(wchar_t *, const wchar_t *);
 #define                      wcscat d0g_wcscat
