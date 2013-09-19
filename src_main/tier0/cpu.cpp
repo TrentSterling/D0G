@@ -372,7 +372,7 @@ unsigned char GetARMCountFromPROC()
 			++count;
 	}
 	fclose(fp);
-	if ((!count) || (count > 255))
+	if ((!count) || (count > 32))
 		return 1;
 	return (unsigned char)count;
 #endif
