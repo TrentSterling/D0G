@@ -19,13 +19,11 @@
 #include <cstd/stdio.h>
 #endif
 
-#include <stdint.h>
-
 #if defined(_LINUX) && !defined(__arm__)
 #include <cpuid.h>
 #endif
 
-static bool cpuid(uint32_t function, uint32_t &out_eax, uint32_t &out_ebx, uint32_t &out_ecx, uint32_t &out_edx)
+static bool cpuid(uint32 function, uint32 &out_eax, uint32 &out_ebx, uint32 &out_ecx, uint32 &out_edx)
 {
 #if defined(__arm__)
 	return false;
@@ -35,7 +33,7 @@ static bool cpuid(uint32_t function, uint32_t &out_eax, uint32_t &out_ebx, uint3
 	return false;
 #else
 	bool retval = true;
-	uint32_t local_eax, local_ebx, local_ecx, local_edx;
+	uint32 local_eax, local_ebx, local_ecx, local_edx;
 	_asm pushad;
 
 	__try
@@ -73,7 +71,7 @@ bool CheckMMXTechnology(void)
 #if defined(__arm__)
 	return false;
 #else
-    uint32_t eax,ebx,edx,unused;
+    uint32 eax,ebx,edx,unused;
     if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -143,7 +141,7 @@ bool CheckSSETechnology(void)
 	if (IsWin98OrOlder())
 		return false;
 
-    uint32_t eax,ebx,edx,unused;
+    uint32 eax,ebx,edx,unused;
     if (!cpuid(1,eax,ebx,unused,edx))
 		return false;
 
@@ -156,7 +154,7 @@ bool CheckSSE2Technology(void)
 #if defined(__arm__)
 	return false;
 #else
-	uint32_t eax,ebx,edx,unused;
+	uint32 eax,ebx,edx,unused;
     if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -169,7 +167,7 @@ bool Check3DNowTechnology(void)
 #if defined(__arm__)
 	return false;
 #else
-	uint32_t eax, unused;
+	uint32 eax, unused;
     if ( !cpuid(0x80000000,eax,unused,unused,unused) )
 		return false;
 
@@ -189,7 +187,7 @@ bool CheckCMOVTechnology()
 #if defined(__arm__)
 	return false;
 #else
-	uint32_t eax,ebx,edx,unused;
+	uint32 eax,ebx,edx,unused;
     if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -202,7 +200,7 @@ bool CheckFCMOVTechnology(void)
 #if defined(__arm__)
 	return false;
 #else
-    uint32_t eax,ebx,edx,unused;
+    uint32 eax,ebx,edx,unused;
     if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -215,7 +213,7 @@ bool CheckRDTSCTechnology(void)
 #if defined(__arm__)
 	return false;
 #else
-	uint32_t eax,ebx,edx,unused;
+	uint32 eax,ebx,edx,unused;
     if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -229,7 +227,7 @@ const tchar* GetProcessorVendorId()
 #if defined(__arm__)
 	return "Generic_ARM";
 #else
-	uint32_t unused, VendorIDRegisters[3];
+	uint32 unused, VendorIDRegisters[3];
 
 	static tchar VendorID[13];
 	
@@ -272,7 +270,7 @@ static bool HTSupported(void)
 	const unsigned int EXT_FAMILY_ID = 0x0f00000;	// EAX[23:20] - Bit 23 thru 20 contains extended family  processor id
 	const unsigned int PENTIUM4_ID   = 0x0f00;		// Pentium 4 family processor id
 
-	uint32_t unused,
+	uint32 unused,
 				  reg_eax = 0, 
 				  reg_edx = 0,
 				  vendor_id[3] = {0, 0, 0};
@@ -302,7 +300,7 @@ static uint8 LogicalProcessorsPerPackage(void)
 	// EBX[23:16] indicate number of logical processors per package
 	const unsigned NUM_LOGICAL_BITS = 0x00FF0000;
 
-    uint32_t unused, reg_ebx = 0;
+    uint32 unused, reg_ebx = 0;
 
 	if ( !HTSupported() ) 
 		return 1; 
