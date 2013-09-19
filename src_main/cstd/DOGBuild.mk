@@ -1,5 +1,5 @@
 DOG_SRC_FILES := \
-  iswctype.cpp \
+  iswdigit.cpp \
   mbstowcs.cpp \
   towlowerupper.cpp \
   vswprintf.cpp \
@@ -11,3 +11,4 @@ DOG_SRC_FILES := \
   wcsstr.cpp \
   wcstod.cpp \
   wcstombs.cpp
+DOG_STATIC_LIBRARY := true

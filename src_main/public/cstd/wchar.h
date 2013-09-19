@@ -65,13 +65,31 @@ THE SOFTWARE. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern int               d0g_iswcntrl(wchar_t);
+inline int               d0g_iswcntrl(wchar_t c)
+{
+	return (c <= 0x1f) ||
+		((unsigned int)(c - 0x7f) <= 0x20) ||
+		((unsigned int)(c - 0x200b) <= 0x4) ||
+		((unsigned int)(c - 0x202a) <= 0x4) ||
+		((unsigned int)(c - 0xfff9) <= 0x2);
+}
 #define                      iswcntrl d0g_iswcntrl
 extern int               d0g_iswdigit(wchar_t);
 #define                      iswdigit d0g_iswdigit
-extern int               d0g_iswspace(wchar_t);
+inline int               d0g_iswspace(wchar_t c)
+{
+	return ((unsigned int)(c - 0x9) <= 0x4) ||
+		(c == 0x20) || (c == 0xa0) ||
+		(c == 0x1680) || (c == 0x180e) ||
+		((unsigned int)(c - 0x2000) <= 0xa) ||
+		(c == 0x2028) || (c == 0x2029) ||
+		(c == 0x205f) || (c == 0x3000);
+}
 #define                      iswspace d0g_iswspace
-extern int               d0g_iswxdigit(wchar_t);
+inline int               d0g_iswxdigit(wchar_t c)
+{
+	return ((unsigned int)(c - L'0') < 10) || ((unsigned int)((c | 0x20) - L'a') < 6);
+}
 #define                      iswxdigit d0g_iswxdigit
 
 extern size_t            d0g_mbstowcs(wchar_t *, const char *, size_t);

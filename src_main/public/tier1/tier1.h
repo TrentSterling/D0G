@@ -21,7 +21,9 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class ICvar;
+#ifndef __ANDROID__
 class IProcessUtils;
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -32,7 +34,9 @@ class IProcessUtils;
 //-----------------------------------------------------------------------------
 extern ICvar *cvar;
 extern ICvar *g_pCVar;
+#ifndef __ANDROID__
 extern IProcessUtils *g_pProcessUtils;
+#endif
 
 
 //-----------------------------------------------------------------------------

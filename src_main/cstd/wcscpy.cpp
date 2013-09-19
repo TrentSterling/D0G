@@ -20,7 +20,7 @@
 
 #include <cstd/wchar.h>
 
-wchar_t *d0g_wcscpy(wchar_t *dest, const wchar_t *src)
+extern "C" wchar_t *d0g_wcscpy(wchar_t *dest, const wchar_t *src)
 {
 	wint_t c;
 	wchar_t *wcp = dest;
@@ -32,7 +32,7 @@ wchar_t *d0g_wcscpy(wchar_t *dest, const wchar_t *src)
 	return dest;
 }
 
-wchar_t *d0g_wcsncpy(wchar_t *dest, const wchar_t *src, size_t n)
+extern "C" wchar_t *d0g_wcsncpy(wchar_t *dest, const wchar_t *src, size_t n)
 {
 	wint_t c;
 	wchar_t *const s = dest--;

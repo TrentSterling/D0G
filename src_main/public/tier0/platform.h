@@ -384,7 +384,7 @@ typedef void * HINSTANCE;
 	#if defined(__arm__)
 		#define __stdcall
 	#else
-		#define  __stdcall			__attribute__ ((__stdcall__))
+		#define  __stdcall			__attribute__((__stdcall__))
 	#endif
 #endif
 

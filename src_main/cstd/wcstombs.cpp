@@ -25,7 +25,7 @@ THE SOFTWARE. */
 // If ret<n, it's ret+1.
 // If ret==n, it's ret+1 if there's null terminator or 0 if there's no.
 
-size_t d0g_wcstombs(char *s, const wchar_t *pwcs, size_t n)
+extern "C" size_t d0g_wcstombs(char *s, const wchar_t *pwcs, size_t n)
 {
 	wchar_t c;
 	size_t ret = 0;

@@ -20,16 +20,7 @@ THE SOFTWARE. */
 
 #include <cstd/wchar.h>
 
-int d0g_iswcntrl(wchar_t c)
-{
-	return (c <= 0x1f) ||
-		((unsigned int)(c - 0x7f) <= 0x20) ||
-		((unsigned int)(c - 0x200b) <= 0x4) ||
-		((unsigned int)(c - 0x202a) <= 0x4) ||
-		((unsigned int)(c - 0xfff9) <= 0x2);
-}
-
-int d0g_iswdigit(wchar_t c)
+extern "C" int d0g_iswdigit(wchar_t c)
 {
 	if ((c == 0xb2) || (c == 0xb3) || (c == 0xb9))
 		return 1;
@@ -47,19 +38,4 @@ int d0g_iswdigit(wchar_t c)
 		0x400201, 0x0, 0x0, 0x80000000, 0x40001080, 0x8, 0x0, 0x0, 0x9000000, 0x800000, 0xc020800c
 	};
 	return check09 && (ranges09[(c - 0x66) >> 5] & (1 << ((c - 6) & 31)));
-}
-
-int d0g_iswspace(wchar_t c)
-{
-	return ((unsigned int)(c - 0x9) <= 0x4) ||
-		(c == 0x20) || (c == 0xa0) ||
-		(c == 0x1680) || (c == 0x180e) ||
-		((unsigned int)(c - 0x2000) <= 0xa) ||
-		(c == 0x2028) || (c == 0x2029) ||
-		(c == 0x205f) || (c == 0x3000);
-}
-
-int d0g_iswxdigit(wchar_t c)
-{
-	return ((unsigned int)(c - L'0') < 10) || ((unsigned int)((c | 0x20) - L'a') < 6);
 }

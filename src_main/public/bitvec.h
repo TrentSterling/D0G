@@ -242,10 +242,8 @@ public:
 	void	Not(CBitVecT *out) const;
 	
 	void	CopyTo(CBitVecT *out) const;
-	void	Copy( const CBitVecT<BASE_OPS> &other, int nBits );
-	void	Copy( const CBitVecT<BASE_OPS> &other );
-	bool	Compare( const CBitVecT<BASE_OPS> &other, int nBits ) const;
-	bool	Compare( const CBitVecT<BASE_OPS> &other ) const;
+	void	Copy( const CBitVecT<BASE_OPS> &other, int nBits = -1 );
+	bool	Compare( const CBitVecT<BASE_OPS> &other, int nBits = -1 ) const;
 
 	bool	IsAllClear(void) const;		// Are all bits zero?
 	bool	IsAllSet(void) const;		// Are all bits one?
@@ -845,7 +843,7 @@ inline void CBitVecT<BASE_OPS>::ClearAll(void)
 
 //-----------------------------------------------------------------------------
 template <class BASE_OPS>
-inline void CBitVecT<BASE_OPS>::Copy( const CBitVecT<BASE_OPS> &other, int nBits )
+inline void CBitVecT<BASE_OPS>::Copy( const CBitVecT<BASE_OPS> &other, int nBits /* = -1 */ )
 {
 	if ( nBits == -1 )
 	{
@@ -860,17 +858,11 @@ inline void CBitVecT<BASE_OPS>::Copy( const CBitVecT<BASE_OPS> &other, int nBits
 	memcpy( this->Base(), other.Base(), this->GetNumDWords() * sizeof( uint32 ) );
 }
 
-template <class BASE_OPS>
-inline void CBitVecT<BASE_OPS>::Copy(const CBitVecT<BASE_OPS> &other)
-{
-	Copy(other, -1);
-}
-
 //-----------------------------------------------------------------------------
 template <class BASE_OPS>
-inline bool CBitVecT<BASE_OPS>::Compare( const CBitVecT<BASE_OPS> &other, int nBits ) const
+inline bool CBitVecT<BASE_OPS>::Compare( const CBitVecT<BASE_OPS> &other, int nBits /* = -1 */ ) const
 {
-	if ( nBits == - 1 )
+	if ( nBits == -1 )
 	{
 		if ( other.GetNumBits() != this->GetNumBits() )
 		{
@@ -891,12 +883,6 @@ inline bool CBitVecT<BASE_OPS>::Compare( const CBitVecT<BASE_OPS> &other, int nB
 	int nBytes = PAD_NUMBER( nBits, 8 ) >> 3;
 
 	return ( memcmp( this->Base(), other.Base(), nBytes ) == 0 );
-}
-
-template <class BASE_OPS>
-inline bool CBitVecT<BASE_OPS>::Compare( const CBitVecT<BASE_OPS> &other ) const
-{
-	Compare(other, -1);
 }
 
 //-----------------------------------------------------------------------------

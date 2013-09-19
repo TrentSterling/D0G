@@ -26,7 +26,7 @@ THE SOFTWARE. */
 // THIS IS AN AWFUL HACK FOR ASCII ONLY - DO NOT USE WIDE STRINGS IN FORMATS!!!
 // REPLACE WIDE STRING FORMATTING WITH WCSCPY/WCSCAT ON SIGHT!!!
 
-int d0g_vsnwprintf(wchar_t *s, size_t n, const wchar_t *format, va_list args)
+extern "C" int d0g_vsnwprintf(wchar_t *s, size_t n, const wchar_t *format, va_list args)
 {
 	if (!n)
 		return 0;
@@ -50,7 +50,7 @@ int d0g_vsnwprintf(wchar_t *s, size_t n, const wchar_t *format, va_list args)
 	return ret;
 }
 
-int d0g_vswprintf(wchar_t *s, const wchar_t *format, va_list args)
+extern "C" int d0g_vswprintf(wchar_t *s, const wchar_t *format, va_list args)
 {
 	size_t size = d0g_wcstombs(NULL, format, 0);
 	if (!size)
@@ -71,7 +71,7 @@ int d0g_vswprintf(wchar_t *s, const wchar_t *format, va_list args)
 	return ret;
 }
 
-int d0g_snwprintf(wchar_t *s, size_t n, const wchar_t *format, ...)
+extern "C" int d0g_snwprintf(wchar_t *s, size_t n, const wchar_t *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);
@@ -80,7 +80,7 @@ int d0g_snwprintf(wchar_t *s, size_t n, const wchar_t *format, ...)
 	return ret;
 }
 
-int d0g_swprintf(wchar_t *s, const wchar_t *format, ...)
+extern "C" int d0g_swprintf(wchar_t *s, const wchar_t *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);

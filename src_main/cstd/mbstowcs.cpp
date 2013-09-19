@@ -25,7 +25,7 @@ THE SOFTWARE. */
 // If ret<n, it's ret+1.
 // If ret==n, it's ret+1 if there's null terminator or 0 if there's no.
 
-size_t d0g_mbstowcs(wchar_t *s, const char *pmbs, size_t n)
+extern "C" size_t d0g_mbstowcs(wchar_t *s, const char *pmbs, size_t n)
 {
 	int bytesNeeded = 0;
 	wchar_t c;

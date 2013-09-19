@@ -20,7 +20,7 @@
 
 #include <cstd/wchar.h>
 
-int d0g_wcscmp(const wchar_t *s1, const wchar_t *s2)
+extern "C" int d0g_wcscmp(const wchar_t *s1, const wchar_t *s2)
 {
 	wchar_t c1, c2;
 	do
@@ -33,7 +33,7 @@ int d0g_wcscmp(const wchar_t *s1, const wchar_t *s2)
 	return c1 < c2 ? -1 : 1;
 }
 
-int d0g_wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t n)
+extern "C" int d0g_wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
 	wchar_t c1 = 0, c2 = 0;
 	if (n >= 4)

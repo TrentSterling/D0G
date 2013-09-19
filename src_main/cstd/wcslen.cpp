@@ -20,7 +20,7 @@
 
 #include <cstd/wchar.h>
 
-size_t d0g_wcslen(const wchar_t *s)
+extern "C" size_t d0g_wcslen(const wchar_t *s)
 {
 	const wchar_t *wcp = s;
 	while (*s)
@@ -36,7 +36,7 @@ size_t d0g_wcslen(const wchar_t *s)
 	return s - wcp;
 }
 
-size_t d0g_wcsnlen(const wchar_t *s, size_t maxlen)
+extern "C" size_t d0g_wcsnlen(const wchar_t *s, size_t maxlen)
 {
 	const wchar_t *wcp = s;
 	while (maxlen && *s)
