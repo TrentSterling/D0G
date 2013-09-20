@@ -5,6 +5,7 @@ Say "map testchmb_a_01" to the robots!
 ## Done
 ### Unreleased
 * tier1.
+* tier2.
 * vstdlib.
 
 ### Released
