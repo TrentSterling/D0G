@@ -5,7 +5,8 @@
 //
 //===========================================================================//
 
-#ifndef __arm__
+#ifndef _LINUX
+// Valve has scrapped 3DNow! support on Linux.
 
 #include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
@@ -102,10 +103,10 @@ float FASTCALL _3DNow_VectorNormalize (Vector& vec)
 #elif _LINUX	
 		long long a,c;
     		int b,d;
-    		memcpy(&a,&vec[0],sizeof(a));
-    		memcpy(&b,&vec[2],sizeof(b));
-    		memcpy(&c,&vec[0],sizeof(c));
-    		memcpy(&d,&vec[2],sizeof(d));
+			a = *((long long *)(&(vec[0])));
+			b = *((int *)(&(vec[2])));
+			c = a;
+			d = b;
 
       		__asm __volatile__( "femms" );
         	__asm __volatile__
@@ -122,8 +123,8 @@ float FASTCALL _3DNow_VectorNormalize (Vector& vec)
         		: "=y" (radius), "=y" (c), "=y" (d)
         		: "y" (a), "0" (b), "1" (c), "2" (d)
         	);
-      		memcpy(&vec[0],&c,sizeof(c));
-      		memcpy(&vec[2],&d,sizeof(d));		
+			*((long long *)(&(vec[0]))) = c;
+			*((int *)(&(vec[2]))) = d;	
         	__asm __volatile__( "femms" );
 
 #else
@@ -166,9 +167,9 @@ float _3DNow_InvRSquared(const float* v)
 #elif _LINUX
 		long long a,c;
     		int b;
-    		memcpy(&a,&v[0],sizeof(a));
-    		memcpy(&b,&v[2],sizeof(b));
-    		memcpy(&c,&v[0],sizeof(c));
+			a = *((long long *)(v));
+			b = *((int *)(v + 2));
+			c = a;
 
       		__asm __volatile__( "femms" );
         	__asm __volatile__
@@ -191,4 +192,4 @@ float _3DNow_InvRSquared(const float* v)
 	return r2;
 }
 
-#endif // __arm__
+#endif // _LINUX

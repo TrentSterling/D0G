@@ -15,6 +15,9 @@
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "sse.h"
+#ifdef _LINUX
+#include <xmmintrin.h>
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -40,16 +43,16 @@ static const uint32 _sincos_inv_masks[] = { (uint32)~0x0, (uint32)0x0 };
 		static const __declspec(align(16)) float _ps_##Name[4] = { Val, Val, Val, Val }
 #elif _LINUX
 	#define _PS_EXTERN_CONST(Name, Val) \
-		const __attribute__((aligned(16))) float _ps_##Name[4] = { Val, Val, Val, Val }
+		const float _ps_##Name[4] __attribute__((aligned(16))) = { Val, Val, Val, Val }
 
 	#define _PS_EXTERN_CONST_TYPE(Name, Type, Val) \
-		const __attribute__((aligned(16))) Type _ps_##Name[4] = { Val, Val, Val, Val }; \
+		const Type _ps_##Name[4]  __attribute__((aligned(16))) = { Val, Val, Val, Val }; \
 
 	#define _EPI32_CONST(Name, Val) \
-		static const __attribute__((aligned(16))) int32 _epi32_##Name[4] = { Val, Val, Val, Val }
+		static const int32 _epi32_##Name[4]  __attribute__((aligned(16))) = { Val, Val, Val, Val }
 
 	#define _PS_CONST(Name, Val) \
-		static const __attribute__((aligned(16))) float _ps_##Name[4] = { Val, Val, Val, Val }
+		static const float _ps_##Name[4]  __attribute__((aligned(16))) = { Val, Val, Val, Val }
 #endif
 
 _PS_EXTERN_CONST(am_0, 0.0f);
@@ -94,14 +97,7 @@ float _SSE_Sqrt(float x)
 		movss		root, xmm0
 	}
 #elif _LINUX
-	__asm__ __volatile__(
-		"movss %1,%%xmm2\n"
-		"sqrtss %%xmm2,%%xmm1\n"
-		"movss %%xmm1,%0"
-       	: "=m" (root)
-		: "m" (x)
-		: "%xmm1", "%xmm2"
-	);
+	_mm_store_ss( &root, _mm_sqrt_ss( _mm_load_ss( &x ) ) );
 #endif
 	return root;
 }
@@ -124,6 +120,12 @@ float _SSE_RSqrtAccurate(float x)
 	return (0.5f * rroot) * (3.f - (x * rroot) * rroot);
 }
 #else
+
+#ifdef _LINUX
+const __m128  f3  = _mm_set_ss(3.0f);  // 3 as SSE value
+const __m128  f05 = _mm_set_ss(0.5f);  // 0.5 as SSE value
+#endif
+
 // Intel / Kipps SSE RSqrt.  Significantly faster than above.
 float _SSE_RSqrtAccurate(float a)
 {
@@ -148,21 +150,18 @@ float _SSE_RSqrtAccurate(float a)
 		movss   x,    xmm1;
 	}
 #elif _LINUX
-	__asm__ __volatile__(
-		"movss   %1, %%xmm3 \n\t"
-        "movss   %2, %%xmm1 \n\t"
-        "movss   %3, %%xmm2 \n\t"
-        "rsqrtss %%xmm3, %%xmm0 \n\t"
-        "mulss   %%xmm0, %%xmm3 \n\t"
-        "mulss   %%xmm0, %%xmm1 \n\t"
-        "mulss   %%xmm0, %%xmm3 \n\t"
-        "subss   %%xmm3, %%xmm2 \n\t"
-        "mulss   %%xmm2, %%xmm1 \n\t"
-        "movss   %%xmm1, %0 \n\t"
-		: "=m" (x)
-		: "m" (a), "m" (half), "m" (three)
-		: "%xmm0", "%xmm1", "%xmm2", "%xmm3"
-);
+	__m128  xx = _mm_load_ss( &a );
+    __m128  xr = _mm_rsqrt_ss( xx );
+    __m128  xt;
+	
+    xt = _mm_mul_ss( xr, xr );
+    xt = _mm_mul_ss( xt, xx );
+    xt = _mm_sub_ss( f3, xt );
+    xt = _mm_mul_ss( xt, f05 );
+    xr = _mm_mul_ss( xr, xt );
+	
+    _mm_store_ss( &a, xr );
+    return a;
 #else
 	#error "Not Implemented"
 #endif
@@ -185,13 +184,7 @@ float _SSE_RSqrtFast(float x)
 		movss	rroot, xmm0
 	}
 #elif _LINUX
-	 __asm__ __volatile__(
-		"rsqrtss %1, %%xmm0 \n\t"
-		"movss %%xmm0, %0 \n\t"
-		: "=m" (rroot)
-		: "m" (x)
-		: "%xmm0"
-	);
+	__asm__ __volatile__( "rsqrtss %0, %1" : "=x" (rroot) : "x" (x) );
 #else
 #error
 #endif
@@ -315,6 +308,7 @@ float _SSE_InvRSquared(const float* v)
 	}
 #elif _LINUX
 		__asm__ __volatile__(
+		"movss			 %0, %%xmm5 \n\t"
 #ifdef ALIGNED_VECTOR
 		"movaps          %1, %%xmm4 \n\t"
 #else

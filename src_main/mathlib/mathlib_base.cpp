@@ -22,8 +22,7 @@
 
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
-#if !defined(__arm__)
-#if !defined( _X360 )
+#if !defined(__arm__) && !defined(_X360)
 #include "mathlib/amd3dx.h"
 #include "3dnow.h"
 #include "sse.h"
@@ -31,7 +30,6 @@
 
 #include "mathlib/ssemath.h"
 #include "mathlib/ssequaternion.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -3229,6 +3227,7 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		s_bMMXEnabled = false;
 	}
 
+#if !defined(_LINUX)
 	// SSE Generally performs better than 3DNow when present, so this is placed 
 	// first to allow SSE to override these settings.
 	if ( bAllow3DNow && pi.m_b3DNow )
@@ -3247,6 +3246,7 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	{
 		s_b3DNowEnabled = false;
 	}
+#endif
 
 	if ( bAllowSSE && pi.m_bSSE )
 	{
