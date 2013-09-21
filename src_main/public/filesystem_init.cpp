@@ -17,6 +17,9 @@
 #include <io.h>
 #include <process.h>
 #elif defined( _LINUX )
+#if defined(__ANDROID__)
+#include <dirent.h>
+#endif
 #include <unistd.h>
 #define _putenv putenv
 #define _chdir chdir
@@ -595,6 +598,50 @@ static void FileSystem_AddLoadedSearchPath(
 	initInfo.m_pFileSystem->AddSearchPath( fullLocationPath, pPathID, PATH_ADD_TO_TAIL );
 }
 
+#ifdef __ANDROID__
+static void FileSystem_AddAndroidOBB(CFSSearchPathsInit &initInfo, const char *pPathID)
+{
+	int highestMain = -1, highestPatch = -1;
+
+	DIR *dirp = opendir("/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME);
+	if (!dirp)
+		return;
+	struct dirent *entry;
+	int i;
+
+	while ((entry = readdir(dirp)) != NULL)
+	{
+		if (sscanf(entry->d_name, "main.%i." SRC_ANDROID_PACKAGE_NAME ".obb", &i) == 1)
+		{
+			if (i > highestMain)
+				highestMain = i;
+		}
+		else if (sscanf(entry->d_name, "patch.%i." SRC_ANDROID_PACKAGE_NAME ".obb", &i) == 1)
+		{
+			if (i > highestPatch)
+				highestPatch = i;
+		}
+	}
+	closedir(dirp);
+
+	char path[MAX_PATH];
+	if (highestPatch >= 0)
+	{
+		Q_snprintf(path, sizeof(path),
+			"/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME "/patch.%i." SRC_ANDROID_PACKAGE_NAME ".obb",
+			highestPatch);
+		initInfo.m_pFileSystem->AddPackFile(path, pPathID);
+	}
+	if (highestMain >= 0)
+	{
+		Q_snprintf(path, sizeof(path),
+			"/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME "/main.%i." SRC_ANDROID_PACKAGE_NAME ".obb",
+			highestMain);
+		initInfo.m_pFileSystem->AddPackFile(path, pPathID);
+	}
+}
+#endif
+
 
 bool FileSystem_IsHldsUpdateToolDedicatedServer()
 {
@@ -630,16 +677,30 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 	#define GAMEINFOPATH_TOKEN		"|gameinfo_path|"
 	#define BASESOURCEPATHS_TOKEN	"|all_source_engine_paths|"
+	#define ANDROIDOBB_TOKEN		"|android_obb|"
 
 	bool bLowViolence = IsLowViolenceBuild();
 	bool bFirstGamePath = true;
+#ifdef __ANDROID__
+	bool bAndroidOBBAdded = false;
+#endif
 	
 	for ( KeyValues *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
 		const char *pPathID = pCur->GetName();
 		const char *pLocation = pCur->GetString();
 		
-		if ( Q_stristr( pLocation, GAMEINFOPATH_TOKEN ) == pLocation )
+		if (Q_stristr(pLocation, ANDROIDOBB_TOKEN) == pLocation)
+		{
+#ifdef __ANDROID__
+			if (!bAndroidOBBAdded)
+			{
+				FileSystem_AddAndroidOBB(initInfo, pPathID);
+				bAndroidOBBAdded = true;
+			}
+#endif
+		}
+		else if ( Q_stristr( pLocation, GAMEINFOPATH_TOKEN ) == pLocation )
 		{
 			pLocation += strlen( GAMEINFOPATH_TOKEN );
 			FileSystem_AddLoadedSearchPath( initInfo, pPathID, &bFirstGamePath, initInfo.m_pDirectoryName, pLocation, bLowViolence );
