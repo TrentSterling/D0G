@@ -983,9 +983,12 @@ PLATFORM_INTERFACE void* Plat_SimpleLog( const tchar* file, int line );
 //-----------------------------------------------------------------------------
 #if defined(_WIN32)
 PLATFORM_INTERFACE bool Plat_IsInDebugSession();
-PLATFORM_INTERFACE void Plat_DebugString( const char * );
 #else
 #define Plat_IsInDebugSession() (false)
+#endif
+#if defined(_WIN32) || defined(__ANDROID__)
+PLATFORM_INTERFACE void Plat_DebugString(const char *);
+#else
 #define Plat_DebugString(s) ((void)0)
 #endif
 

@@ -22,7 +22,7 @@ ifeq ($(DOG_STATIC_LIBRARY),true)
   include $(BUILD_STATIC_LIBRARY)
 else
   LOCAL_CFLAGS += -D_SHARED_LIB -D_USRDLL
-  LOCAL_LDFLAGS := -shared
+  LOCAL_LDFLAGS := -shared -llog
   ifneq ($(DOG_PROJECT),srcactivity)
     LOCAL_LDFLAGS += -L"$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)" -lgnustl_shared -lsupc++
   endif

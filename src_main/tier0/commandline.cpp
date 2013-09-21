@@ -23,6 +23,10 @@
 #define _MAX_PATH PATH_MAX
 #endif
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -177,7 +181,11 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, int m
 	}
 	else
 	{
+#ifdef __ANDROID__
+		__android_log_print(ANDROID_LOG_WARN, "CCommandLine", "Parameter file '%s' not found, skipping...", szFileName);
+#else
 		printf( "Parameter file '%s' not found, skipping...", szFileName );
+#endif
 	}
 }
 

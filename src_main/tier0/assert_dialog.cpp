@@ -1,18 +1,21 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
-//=============================================================================//
+//===========================================================================//
 
 #include "pch_tier0.h"
 
 #include "tier0/valve_off.h"
-#ifdef _X360
+#if defined(_X360)
 #include "xbox/xbox_console.h"
 #include "xbox/xbox_vxconsole.h"
 #elif defined( _WIN32 )
 #include <windows.h>
-#elif _LINUX
+#elif defined(__ANDROID__)
+#include <android/log.h>
+#elif defined(_LINUX)
 char *GetCommandLine();
 #endif
 #include "resource.h"
@@ -437,6 +440,10 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 		DialogBox( g_hTier0Instance, MAKEINTRESOURCE( IDD_ASSERT_DIALOG ), hParentWindow, AssertDialogProc );
 	}
+
+#elif __ANDROID__
+
+	__android_log_print(ANDROID_LOG_ERROR, "Assertion Failed", "%s %i %s", pFilename, line, pExpression);
 
 #elif _LINUX
 

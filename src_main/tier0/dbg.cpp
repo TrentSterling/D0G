@@ -73,7 +73,7 @@ SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 #endif
 	{
 		_tprintf( _T("%s"), pMsg );
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
 		Plat_DebugString( pMsg );
 #endif
 	}

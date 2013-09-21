@@ -17,6 +17,7 @@
 #include <stdarg.h>
 #include <cstd/string.h>
 #include <stdlib.h>
+#include <android/log.h>
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
 												
@@ -200,7 +201,7 @@ void BuildCmdLine( int argc, char **argv )
 
         if ( len > MAX_LINUX_CMDLINE )
         {
-                printf( "command line too long, %i max\n", MAX_LINUX_CMDLINE );
+                __android_log_print(ANDROID_LOG_ERROR, "BuildCmdLine", "command line too long, %i max", MAX_LINUX_CMDLINE);
                 exit(-1);
                 return;
         }

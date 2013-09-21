@@ -13,6 +13,9 @@
 
 #include <sys/time.h>
 #include <unistd.h>
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
 
 double Plat_FloatTime()
 {
@@ -121,3 +124,10 @@ PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()
 {
 	return g_CmdLine;
 }
+
+#ifdef __ANDROID__
+void Plat_DebugString(const char *psz)
+{
+	__android_log_print(ANDROID_LOG_INFO, "Debug", "%s", psz);
+}
+#endif
