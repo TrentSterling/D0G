@@ -327,6 +327,9 @@ static bool Sys_GetExecutableName( char *out, int len )
     {
 		return false;
     }
+#elif defined(__ANDROID__)
+	strncpy(out, SRC_ANDROID_PACKAGE, len);
+	out[len - 1] = '\0';
 #else
 	if ( CommandLine()->GetParm(0) )
 	{
@@ -343,6 +346,14 @@ static bool Sys_GetExecutableName( char *out, int len )
 
 bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
 {
+#ifdef __ANDROID__
+	char wd[PATH_MAX + 4];
+	if (!getwd(wd))
+		return false;
+	strcat(wd, "/bin");
+	strncpy(exedir, wd, exeDirLen);
+	exedir[exeDirLen - 1] = '\0';
+#else
 	exedir[0] = 0;
 
 	if ( s_bUseVProjectBinDir )
@@ -386,6 +397,7 @@ bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
 		Q_strncat( exedir, "\\bin", exeDirLen, COPY_ALL_CHARACTERS );
 		Q_FixSlashes( exedir );
 	}
+#endif
 	
 	return true;
 }
@@ -1226,7 +1238,7 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 	if ( !FileSystem_GetExecutableDir( executablePath, sizeof( executablePath ) )	)
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
 	
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_WIN32) && !defined(_X360)
 	// If filesystem_stdio.dll is missing or -steam is specified, then load filesystem_steam.dll.
 	// There are two command line parameters for Steam:
 	//		1) -steam (runs Steam in remote filesystem mode; requires Steam backend)
@@ -1237,10 +1249,12 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 		Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam.dll", executablePath, CORRECT_PATH_SEPARATOR );
 		bSteam = true;
 	}
-#elif defined( _X360 )
-	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio.dll", executablePath, CORRECT_PATH_SEPARATOR );
-#elif defined( _LINUX )
-	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_i486.so", executablePath, CORRECT_PATH_SEPARATOR );
+#elif defined(_X360)
+	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio.dll", executablePath, CORRECT_PATH_SEPARATOR);
+#elif defined(__ANDROID__)
+	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem.so", executablePath, CORRECT_PATH_SEPARATOR);
+#elif defined(_LINUX)
+	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem_i486.so", executablePath, CORRECT_PATH_SEPARATOR);
 #else
 	#error "define a filesystem dll name"
 #endif
