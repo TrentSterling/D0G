@@ -208,11 +208,11 @@ void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinityMask )
 		hThread = ThreadGetCurrentHandle();
 	}
 
-#ifdef _WIN32
+#if defined(_WIN32)
 	SetThreadAffinityMask( hThread, nAffinityMask );
-#elif __ANDROID__
+#elif defined(__ANDROID__)
 	syscall(__NR_sched_setaffinity, hThread, sizeof(int), &nAffinityMask);
-#elif _LINUX
+#elif defined(_LINUX)
 	cpu_set_t cpuSet;
 	CPU_ZERO(cpuSet);
 	for( int i = 0 ; i < 32; i++ )

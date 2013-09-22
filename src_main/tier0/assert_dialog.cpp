@@ -369,7 +369,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	g_bBreak = false;
 
-#if defined( _X360 )
+#if defined(_X360)
 
 	char cmdString[XBX_MAX_RCMDLENGTH];
 
@@ -419,7 +419,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		}
 	}
 
-#elif defined( _WIN32 )
+#elif defined(_WIN32)
 
 	if ( !ThreadInMainThread() )
 	{
@@ -441,11 +441,11 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		DialogBox( g_hTier0Instance, MAKEINTRESOURCE( IDD_ASSERT_DIALOG ), hParentWindow, AssertDialogProc );
 	}
 
-#elif __ANDROID__
+#elif defined(__ANDROID__)
 
 	__android_log_print(ANDROID_LOG_ERROR, "Assertion Failed", "%s %i %s", pFilename, line, pExpression);
 
-#elif _LINUX
+#elif defined(_LINUX)
 
 	fprintf(stderr, "%s %i %s", pFilename, line, pExpression);
 
