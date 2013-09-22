@@ -751,18 +751,18 @@ inline T DWordSwapAsm(T dw)
 //-------------------------------------
 
 #if defined(__i386__) || defined(__arm__)
-#define LITTLE_ENDIAN 1
+#define VALVE_LITTLE_ENDIAN 1
 #endif
 
 #if defined( _SGI_SOURCE ) || defined( _X360 )
-#define	BIG_ENDIAN 1
+#define VALVE_BIG_ENDIAN 1
 #endif
 
 // If a swapped float passes through the fpu, the bytes may get changed.
 // Prevent this by swapping floats as DWORDs.
 #define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((uint*)pIn) ))
 
-#if defined(LITTLE_ENDIAN)
+#if defined(VALVE_LITTLE_ENDIAN)
 
 #define BigShort( val )				WordSwap( val )
 #define BigWord( val )				WordSwap( val )
@@ -782,7 +782,7 @@ inline T DWordSwapAsm(T dw)
 #define LittleFloat( pOut, pIn )	( *pOut = *pIn )
 #define SwapFloat( pOut, pIn )		BigFloat( pOut, pIn )
 
-#elif defined(BIG_ENDIAN)
+#elif defined(VALVE_BIG_ENDIAN)
 
 #define BigShort( val )				( val )
 #define BigWord( val )				( val )
