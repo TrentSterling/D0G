@@ -255,6 +255,7 @@ typedef unsigned int DWORD;
 typedef unsigned short WORD;
 typedef void * HINSTANCE;
 #define _MAX_PATH PATH_MAX
+#define MAX_PATH PATH_MAX
 #endif // defined(_WIN32) && !defined(WINDED)
 
 
@@ -286,7 +287,7 @@ typedef void * HINSTANCE;
 	#endif
 #endif
 
-#if defined __i386__ && !defined __linux__
+#if defined __i386__ && !defined __linux__ // D0GTODO: Port engine sound functions to x86 asm and maybe ARM asm
 	#define id386	1
 #else
 	#define id386	0
