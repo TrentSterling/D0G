@@ -3,6 +3,10 @@ LOCAL_PATH := $(DOG_SRC_MAIN)/$(DOG_PROJECT)
 
 include $(DOG_PROJECT)/DOGBuild.mk
 
+ifneq ($(DOG_NO_CSTD),true)
+  DOG_PUBLIC_LIBRARIES := cstd $(DOG_PUBLIC_LIBRARIES)
+endif
+
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 
   include $(CLEAR_VARS)

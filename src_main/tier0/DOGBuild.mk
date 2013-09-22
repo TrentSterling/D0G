@@ -1,9 +1,7 @@
+DOG_C_DEFINES := TIER0_DLL_EXPORT
 DOG_C_INCLUDES := \
   "$(DOG_SRC_MAIN)/public/tier0" \
   "$(DOG_SRC_MAIN)/public/tier1"
-DOG_CFLAGS := -DTIER0_DLL_EXPORT
-DOG_PUBLIC_LIBRARIES := \
-  cstd
 DOG_SRC_FILES := \
   assert_dialog.cpp \
   commandline.cpp \
