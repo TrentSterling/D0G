@@ -611,6 +611,8 @@ static void FileSystem_AddAndroidOBB(CFSSearchPathsInit &initInfo, const char *p
 
 	while ((entry = readdir(dirp)) != NULL)
 	{
+		if (entry->d_type == DT_DIR)
+			continue;
 		if (sscanf(entry->d_name, "main.%i." SRC_ANDROID_PACKAGE_NAME ".obb", &i) == 1)
 		{
 			if (i > highestMain)
