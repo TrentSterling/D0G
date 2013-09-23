@@ -26,6 +26,7 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <sys/time.h>
 #include <unistd.h>
 #ifdef __ANDROID__
+#include <linux/sched.h>
 #include <sys/syscall.h>
 #include "android_win32stubs.h"
 #endif
@@ -1497,11 +1498,11 @@ bool CThread::Join(unsigned timeout)
 //---------------------------------------------------------
 
 #ifdef _WIN32
-
 HANDLE CThread::GetThreadHandle()
 {
 	return m_hThread;
 }
+#endif
 
 //---------------------------------------------------------
 
@@ -1509,8 +1510,6 @@ uint CThread::GetThreadId()
 {
 	return m_threadId;
 }
-
-#endif
 
 //---------------------------------------------------------
 
@@ -1574,30 +1573,23 @@ bool CThread::SetPriority(int priority)
 #endif
 }
 
+#ifdef _WIN32
+
 //---------------------------------------------------------
 
 unsigned CThread::Suspend()
 {
-#ifdef _WIN32
 	return ( SuspendThread(m_hThread) != 0 );
-#elif _LINUX
-	Assert ( 0 );
-	return 0;
-#endif
 }
 
 //---------------------------------------------------------
 
 unsigned CThread::Resume()
 {
-#ifdef _WIN32
 	return ( ResumeThread(m_hThread) != 0 );
-#elif _LINUX
-	Assert ( 0 );
-	return 0;
-#endif
 }
 
+#endif
 //---------------------------------------------------------
 
 bool CThread::Terminate(int exitCode)
@@ -1805,7 +1797,7 @@ int CWorkerThread::CallMaster(unsigned dw, unsigned timeout)
 
 //---------------------------------------------------------
 
-HANDLE CWorkerThread::GetCallHandle()
+CThreadEvent &CWorkerThread::GetCallHandle()
 {
 	return m_EventSend;
 }
@@ -1830,11 +1822,20 @@ int CWorkerThread::BoostPriority()
 
 //---------------------------------------------------------
 
-static uint32 __stdcall DefaultWaitFunc( uint32 nHandles, const HANDLE*pHandles, int bWaitAll, uint32 timeout )
+#ifdef _WIN32
+static uint32 __stdcall DefaultWaitFunc(uint32 nHandles, const HANDLE *pHandles, int bWaitAll, uint32 timeout)
 {
 	return VCRHook_WaitForMultipleObjects( nHandles, (const void **)pHandles, bWaitAll, timeout );
 }
-
+#else
+static uint32 DefaultWaitFunc(uint32 nEvents, CThreadEvent * const *pEvents, int bWaitAll, uint32 timeout)
+{
+	int result = ThreadWaitForEvents(nEvents, pEvents, bWaitAll, timeout);
+	if (result == WAIT_OBJECT_0)
+		return WAIT_OBJECT_0 + 1;
+	return result;
+}
+#endif
 
 int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority, WaitFunc_t pfnWait)
 {
@@ -1882,27 +1883,35 @@ int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )
 		pfnWait = DefaultWaitFunc;
 	}
 
+#ifdef _WIN32
 	HANDLE waits[] =
 	{
 		GetThreadHandle(),
-		m_EventComplete
+		m_EventComplete.GetHandle()
 	};
+#else
+	CThreadEvent *waits[] =
+	{
+		&m_EventComplete
+	};
+#endif
 
 	unsigned result;
 	bool bInDebugger = Plat_IsInDebugSession();
 
 	do
 	{
+#ifdef _WIN32
 		// Make sure the thread handle hasn't been closed
 		if ( !GetThreadHandle() )
 		{
 			result = WAIT_OBJECT_0 + 1;
 			break;
 		}
+#endif
 
 		result = (*pfnWait)((sizeof(waits) / sizeof(waits[0])), waits, false,
 			(timeout != TT_INFINITE) ? timeout : 30000);
-
 		AssertMsg(timeout != TT_INFINITE || result != WAIT_TIMEOUT, "Possible hung thread, call to thread timed out");
 
 	} while ( bInDebugger && ( timeout == TT_INFINITE && result == WAIT_TIMEOUT ) );

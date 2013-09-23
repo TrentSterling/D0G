@@ -19,6 +19,9 @@
 #ifdef _LINUX
 #include <pthread.h>
 #include <errno.h>
+#define WAIT_OBJECT_0 0
+#define WAIT_TIMEOUT 0x00000102
+#define WAIT_FAILED -1
 #endif
 
 #if defined( _WIN32 )
@@ -806,7 +809,8 @@ public:
 	// Access handle
 	//-----------------------------------------------------
 #ifdef _WIN32
-	operator HANDLE() { return m_hSyncObject; }
+	operator HANDLE() { return GetHandle(); }
+	const HANDLE GetHandle() const { return m_hSyncObject; }
 #endif
 	//-----------------------------------------------------
 	// Wait for a signal from the object
@@ -936,13 +940,19 @@ public:
 	}
 };
 
-inline int ThreadWaitForEvents( int nEvents, const CThreadEvent *pEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE )
+inline int ThreadWaitForEvents(int nEvents, CThreadEvent * const *pEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE)
 {
 #ifdef _LINUX
-  Assert(0);
-  return 0;
+	Assert(nEvents == 1);
+	if (pEvents[0]->Wait(timeout))
+		return WAIT_OBJECT_0;
+	else
+		return WAIT_TIMEOUT;
 #else
-  return ThreadWaitForObjects( nEvents, (const HANDLE *)pEvents, bWaitAll, timeout );
+	HANDLE handles[64];
+	for (unsigned int i = 0; i < min(nEvents, ARRAYSIZE(handles)); i++)
+		handles[i] = pEvents[i]->GetHandle();
+	return ThreadWaitForObjects(nEvents, handles, bWaitAll, timeout);
 #endif
 }
 
@@ -1058,8 +1068,8 @@ public:
 #ifdef _WIN32
 	// Access the thread handle directly
 	HANDLE GetThreadHandle();
-	uint GetThreadId();
 #endif
+	uint GetThreadId();
 
 	//-----------------------------------------------------
 
@@ -1078,11 +1088,13 @@ public:
 	// Set the priority
 	bool SetPriority( int );
 
+#ifndef _LINUX
 	// Suspend a thread
 	unsigned Suspend();
 
 	// Resume a suspended thread
 	unsigned Resume();
+#endif
 
 	// Force hard-termination of thread.  Used for critical failures.
 	bool Terminate( int exitCode = 0 );
@@ -1179,8 +1191,6 @@ private:
 // synchronized communication.
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
-
 // These are internal reserved error results from a call attempt
 enum WTCallResult_t
 {
@@ -1224,7 +1234,7 @@ public:
 
 	// If you want to do WaitForMultipleObjects you'll need to include
 	// this handle in your wait list or you won't be responsive
-	HANDLE GetCallHandle();
+	CThreadEvent &GetCallHandle();
 
 	// Find out what the request was
 	unsigned GetCallParam() const;
@@ -1233,7 +1243,11 @@ public:
 	int BoostPriority();
 
 protected:
-	typedef uint32 (__stdcall *WaitFunc_t)( uint32 nHandles, const HANDLE*pHandles, int bWaitAll, uint32 timeout );
+#ifdef _WIN32
+	typedef uint32 (__stdcall *WaitFunc_t)( uint32 nHandles, const HANDLE *pHandles, int bWaitAll, uint32 timeout );
+#else
+	typedef uint32 (*WaitFunc_t)( uint32 nEvents, CThreadEvent * const *pEvents, int bWaitAll, uint32 timeout );
+#endif
 	int Call( unsigned, unsigned timeout, bool fBoost, WaitFunc_t = NULL );
 	int WaitForReply( unsigned timeout, WaitFunc_t );
 
@@ -1241,20 +1255,12 @@ private:
 	CWorkerThread( const CWorkerThread & );
 	CWorkerThread &operator=( const CWorkerThread & );
 
-#ifdef _WIN32
 	CThreadEvent	m_EventSend;
 	CThreadEvent	m_EventComplete;
-#endif
 
 	unsigned        m_Param;
 	int				m_ReturnVal;
 };
-
-#else
-
-typedef CThread CWorkerThread;
-
-#endif
 
 // a unidirectional message queue. A queue of type T. Not especially high speed since each message
 // is malloced/freed. Note that if your message class has destructors/constructors, they MUST be
