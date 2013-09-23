@@ -8,6 +8,13 @@
 #ifndef ANDROID_WIN32STUBS_H
 #define ANDROID_WIN32STUBS_H
 
+#define THREAD_PRIORITY_IDLE 0
+#define THREAD_PRIORITY_LOWEST 1
+#define THREAD_PRIORITY_BELOW_NORMAL 25
+#define THREAD_PRIORITY_NORMAL 50
+#define THREAD_PRIORITY_ABOVE_NORMAL 75
+#define THREAD_PRIORITY_HIGHEST 99
+
 typedef struct waveformatex_tag {
 	unsigned short wFormatTag;
 	unsigned short nChannels;

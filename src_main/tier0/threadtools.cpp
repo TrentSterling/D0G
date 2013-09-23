@@ -27,6 +27,7 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <unistd.h>
 #ifdef __ANDROID__
 #include <sys/syscall.h>
+#include "android_win32stubs.h"
 #endif
 #define GetLastError() errno
 typedef void *LPVOID;
@@ -169,14 +170,16 @@ ThreadHandle_t ThreadGetCurrentHandle()
 
 int ThreadGetPriority( ThreadHandle_t hThread )
 {
+	if (!hThread)
+		hThread = ThreadGetCurrentHandle();
 #ifdef _WIN32
-	if ( !hThread )
-	{
-		return ::GetThreadPriority( GetCurrentThread() );
-	}
-	return ::GetThreadPriority( (HANDLE)hThread );
+	return ::GetThreadPriority((HANDLE)hThread);
 #else
-	return 0;
+	struct sched_param param;
+	int policy;
+	if (pthread_getschedparam(hThread, &policy, &param))
+		return THREAD_PRIORITY_NORMAL;
+	return param.sched_priority;
 #endif
 }
 
@@ -184,18 +187,16 @@ int ThreadGetPriority( ThreadHandle_t hThread )
 
 bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 {
-	if ( !hThread )
-	{
+	if (!hThread)
 		hThread = ThreadGetCurrentHandle();
-	}
-
-#ifdef _WIN32
-	return ( SetThreadPriority(hThread, priority) != 0 );
-#elif _LINUX
-	struct sched_param thread_param; 
-	thread_param.sched_priority = priority; 
-	pthread_setschedparam( hThread, SCHED_RR, &thread_param );
-	return true;
+#if defined(_WIN32)
+	return (SetThreadPriority(hThread, priority) != 0);
+#else
+	struct sched_param thread_param;
+	thread_param.sched_priority = priority;
+	if (!priority)
+		return pthread_setschedparam(hThread, SCHED_BATCH, &thread_param) == 0;
+	return pthread_setschedparam(hThread, SCHED_RR, &thread_param) == 0;
 #endif
 }
 
