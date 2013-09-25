@@ -355,7 +355,7 @@ static int64 CalculateClockSpeed()
 }
 
 #if defined(_LINUX)
-unsigned char GetCPUCountFromPROC()
+static unsigned char GetCPUCountFromPROC()
 {
 	unsigned int count = 0;
 	char line[1024], search_str[] = "processor\t:";
