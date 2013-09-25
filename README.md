@@ -5,7 +5,7 @@ Say "map testchmb_a_01" to the robots!
 ## Done
 ### Unreleased
 * tier2.
-* vstdlib.
+* tier3.
 * File system.
 
 ### Released
@@ -14,3 +14,4 @@ Say "map testchmb_a_01" to the robots!
 * Limited 16-bit US locale `wchar` implementation (`swprintf` aliases ANSI `snprintf`, so it must not be used to format strings containing `wchar_t`, also `cstd/wchar.h` must be included `stdlib.h` to override `mbstowcs` and `wcstombs`).
 * tier0.
 * tier1.
+* vstdlib.
