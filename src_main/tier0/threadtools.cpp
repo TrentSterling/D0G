@@ -110,7 +110,8 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	pthread_create(&tid, &attr, ThreadProcConvert, new ThreadProcInfo_t(pfnThread, pParam));
 	if ( pID )
 		*pID = (ThreadId_t)tid;
-	return tid;
+	ThreadSetPriority((ThreadHandle_t)tid, 50); // SCHED_RR
+	return (ThreadHandle_t)tid;
 #endif
 }
 
@@ -179,7 +180,7 @@ int ThreadGetPriority( ThreadHandle_t hThread )
 	struct sched_param param;
 	int policy;
 	if (pthread_getschedparam(hThread, &policy, &param))
-		return THREAD_PRIORITY_NORMAL;
+		return 50;
 	return param.sched_priority;
 #endif
 }
@@ -235,7 +236,9 @@ uint InitMainThread()
 #ifdef _WIN32
 	return ThreadGetCurrentId();
 #elif _LINUX
-	return pthread_self();
+	pthread_t tid = pthread_self();
+	ThreadSetPriority((ThreadHandle_t)tid, 50); // SCHED_RR
+	return tid;
 #endif
 }
 
@@ -1314,10 +1317,14 @@ CThreadLocalPtr<CThread> g_pCurThread;
 CThread::CThread()
 :	
 #ifdef _WIN32
-	m_hThread( NULL ),
+	m_hThread(NULL),
+#else
+	m_nSuspendCount(0),
+	m_SuspendEvent(false),
+	m_SuspendEventSignal(false),
 #endif
-	m_threadId( 0 ),
-	m_result( 0 )
+	m_threadId(0),
+	m_result(0)
 {
 	m_szName[0] = 0;
 }
@@ -1413,6 +1420,7 @@ bool CThread::Start( unsigned nBytesStack )
 		AssertMsg1( 0, "Failed to create thread (error 0x%x)", GetLastError() );
 		return false;
 	}
+	SetPriority(50); // SCHED_RR
 	bInitSuccess = true;
 #endif
 
@@ -1573,9 +1581,37 @@ bool CThread::SetPriority(int priority)
 #endif
 }
 
-#ifdef _WIN32
+//---------------------------------------------------------
+
+#ifdef _LINUX
+
+// Disassembled from the 2013 version
+
+void CThread::SuspendCooperative()
+{
+	if (m_threadId != pthread_self())
+		return;
+	m_SuspendEventSignal.Set();
+	m_nSuspendCount = 1;
+	m_SuspendEvent.Wait(TT_INFINITE);
+	m_nSuspendCount = 0;
+}
 
 //---------------------------------------------------------
+
+void CThread::ResumeCooperative()
+{
+	m_SuspendEvent.Set();
+}
+
+//---------------------------------------------------------
+
+void CThread::BWaitForThreadSuspendCooperative()
+{
+	m_SuspendEventSignal.Wait(TT_INFINITE);
+}
+
+#else
 
 unsigned CThread::Suspend()
 {
@@ -1772,7 +1808,6 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-#ifdef _WIN32
 CWorkerThread::CWorkerThread()
 :	m_EventSend(true),                 // must be manual-reset for PeekCall()
 	m_EventComplete(true),             // must be manual-reset to handle multiple wait with thread properly
@@ -1814,7 +1849,7 @@ unsigned CWorkerThread::GetCallParam() const
 int CWorkerThread::BoostPriority()
 {
 	int iInitialPriority = GetPriority();
-	const int iNewPriority = ::GetThreadPriority(GetCurrentThread());
+	const int iNewPriority = ThreadGetPriority();
 	if (iNewPriority > iInitialPriority)
 		SetPriority(iNewPriority);
 	return iInitialPriority;
@@ -1846,7 +1881,11 @@ int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority,
 	if (!IsAlive())
 		return WTCR_FAIL;
 
+#ifdef _WIN32
 	int iInitialPriority = 0;
+#else
+	int iInitialPriority = 50;
+#endif
 	if (fBoostPriority)
 	{
 		iInitialPriority = BoostPriority();
@@ -1998,6 +2037,5 @@ void CWorkerThread::Reply(unsigned dw)
 	// Tell the client we're finished
 	m_EventComplete.Set();
 }
-#endif // _WIN32
 
 //-----------------------------------------------------------------------------

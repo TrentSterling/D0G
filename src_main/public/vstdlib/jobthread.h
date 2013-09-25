@@ -169,7 +169,7 @@ public:
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
 	//-----------------------------------------------------
-	virtual int YieldWait( CThreadEvent *pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
+	virtual int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
 	virtual int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
 	virtual void Yield( unsigned timeout ) = 0;
 
@@ -1159,7 +1159,8 @@ inline ThreadHandle_t ThreadExecuteSoloRef( const char *pszName, T1 a1, T2 a2, T
 
 inline bool IThreadPool::YieldWait( CThreadEvent &event, unsigned timeout )
 {
-	return ( YieldWait( &event, 1, true, timeout ) != TW_TIMEOUT );
+	CThreadEvent *pEvent = &event;
+	return ( YieldWait( &pEvent, 1, true, timeout ) != TW_TIMEOUT );
 }
 
 inline bool IThreadPool::YieldWait( CJob *pJob, unsigned timeout )
