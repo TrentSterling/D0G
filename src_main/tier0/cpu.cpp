@@ -354,11 +354,9 @@ static int64 CalculateClockSpeed()
 #endif
 }
 
-unsigned char GetARMCountFromPROC()
+#if defined(_LINUX)
+unsigned char GetCPUCountFromPROC()
 {
-#if !defined(__arm__)
-	return 1;
-#else
 	unsigned int count = 0;
 	char line[1024], search_str[] = "processor\t:";
 	FILE *fp;
@@ -373,8 +371,8 @@ unsigned char GetARMCountFromPROC()
 	if ((!count) || (count > 32))
 		return 1;
 	return (unsigned char)count;
-#endif
 }
+#endif
 
 const CPUInformation& GetCPUInformation()
 {
@@ -395,36 +393,30 @@ const CPUInformation& GetCPUInformation()
 	pi.m_Speed = CalculateClockSpeed();
 	
 	// Get the logical and physical processor counts:
-#if defined(__arm__)
-	pi.m_nPhysicalProcessors = pi.m_nLogicalProcessors = GetARMCountFromPROC();
-#else
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
 
-#if defined(_WIN32) && !defined( _X360 )
+#if defined(_X360)
+	pi.m_nPhysicalProcessors = 3;
+	pi.m_nLogicalProcessors  = 6;
+#else
+#if defined(_WIN32)
 	SYSTEM_INFO si;
 	ZeroMemory( &si, sizeof(si) );
 
 	GetSystemInfo( &si );
 
 	pi.m_nPhysicalProcessors = (unsigned char)(si.dwNumberOfProcessors / pi.m_nLogicalProcessors);
+#else
+	pi.m_nPhysicalProcessors = (unsigned char)(GetCPUCountFromPROC() / pi.m_nLogicalProcessors);
+#endif
 	pi.m_nLogicalProcessors = (unsigned char)(pi.m_nLogicalProcessors * pi.m_nPhysicalProcessors);
 
 	// Make sure I always report at least one, when running WinXP with the /ONECPU switch, 
 	// it likes to report 0 processors for some reason.
-	if ( pi.m_nPhysicalProcessors == 0 && pi.m_nLogicalProcessors == 0 )
-	{
+	if (!(pi.m_nPhysicalProcessors))
 		pi.m_nPhysicalProcessors = 1;
-		pi.m_nLogicalProcessors  = 1;
-	}
-#elif defined( _X360 )
-	pi.m_nPhysicalProcessors = 3;
-	pi.m_nLogicalProcessors  = 6;
-#elif defined(_LINUX)
-	// TODO: poll /dev/cpuinfo when we have some benefits from multithreading
-	// D0GTODO: do this TODO
-	pi.m_nPhysicalProcessors = 1;
-	pi.m_nLogicalProcessors  = 1;
-#endif
+	if (!(pi.m_nLogicalProcessors))
+		pi.m_nLogicalProcessors = 1;
 #endif
 
 	// Determine Processor Features:
