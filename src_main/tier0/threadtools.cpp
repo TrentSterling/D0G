@@ -1561,12 +1561,9 @@ void CThread::Stop(int exitCode)
 int CThread::GetPriority() const
 {
 #ifdef _WIN32
-	return GetThreadPriority(m_hThread);
+	return ThreadGetPriority(m_hThread);
 #elif _LINUX
-	struct sched_param thread_param;
-	int policy;
-	pthread_getschedparam( m_threadId, &policy, &thread_param );
-	return thread_param.sched_priority;
+	return ThreadGetPriority(m_threadId);
 #endif
 }
 
