@@ -1190,7 +1190,6 @@ private:
 	ThreadId_t m_threadId;
 #elif defined(_LINUX)
 	pthread_t m_threadId;
-	CInterlockedInt m_nSuspendCount;
 	CThreadEvent m_SuspendEvent;
 	CThreadEvent m_SuspendEventSignal;
 #endif

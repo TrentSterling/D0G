@@ -1319,7 +1319,6 @@ CThread::CThread()
 #ifdef _WIN32
 	m_hThread(NULL),
 #else
-	m_nSuspendCount(0),
 	m_SuspendEvent(false),
 	m_SuspendEventSignal(false),
 #endif
@@ -1589,9 +1588,7 @@ void CThread::SuspendCooperative()
 	if (m_threadId != pthread_self())
 		return;
 	m_SuspendEventSignal.Set();
-	m_nSuspendCount = 1;
 	m_SuspendEvent.Wait(TT_INFINITE);
-	m_nSuspendCount = 0;
 }
 
 //---------------------------------------------------------
