@@ -22,7 +22,7 @@ THE SOFTWARE. */
 #include <stdlib.h>
 #include <cstd/wchar.h>
 
-extern "C" double d0g_wcstod(const wchar_t *nptr, wchar_t **endptr)
+double d0g_wcstod(const wchar_t *nptr, wchar_t **endptr)
 {
 	while (d0g_iswspace(*nptr))
 		++nptr;

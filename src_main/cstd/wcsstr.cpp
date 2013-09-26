@@ -20,7 +20,7 @@
 
 #include <cstd/wchar.h>
 
-extern "C" wchar_t *d0g_wcsstr(const wchar_t *haystack, const wchar_t *needle)
+wchar_t *d0g_wcsstr(const wchar_t *haystack, const wchar_t *needle)
 {
 	wchar_t b, c;
 	if ((b = *needle))

@@ -325,7 +325,7 @@ static const d0g_towlu_range d0g_towupper_ranges[D0G_TOWUPPER_RANGES] = {
 	{D0G_TOWUPPER_RANGE_9_START, D0G_TOWUPPER_RANGE_9_LENGTH, d0g_towupper_range9},
 };
 
-extern "C" wchar_t d0g_towlower(wchar_t c)
+wchar_t d0g_towlower(wchar_t c)
 {
 	if (!(c & 0xff80))
 	{
@@ -345,7 +345,7 @@ extern "C" wchar_t d0g_towlower(wchar_t c)
 	return c;
 }
 
-extern "C" wchar_t d0g_towupper(wchar_t c)
+wchar_t d0g_towupper(wchar_t c)
 {
 	if (!(c & 0xff80))
 	{

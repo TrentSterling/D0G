@@ -3,6 +3,7 @@ DOG_C_INCLUDES := \
   "$(DOG_SRC_MAIN)/public/tier0" \
   "$(DOG_SRC_MAIN)/public/tier1"
 DOG_SRC_FILES := \
+  android_core.cpp \
   assert_dialog.cpp \
   commandline.cpp \
   cpu.cpp \

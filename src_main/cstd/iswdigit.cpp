@@ -20,7 +20,7 @@ THE SOFTWARE. */
 
 #include <cstd/wchar.h>
 
-extern "C" int d0g_iswdigit(wchar_t c)
+int d0g_iswdigit(wchar_t c)
 {
 	if ((c == 0xb2) || (c == 0xb3) || (c == 0xb9))
 		return 1;

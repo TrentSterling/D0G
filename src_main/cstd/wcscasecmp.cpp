@@ -24,7 +24,7 @@
 // because it can exit the loop early for lowercase characeters (they're
 // obviously more common than uppercase ones) and is 1 range shorter.
 
-extern "C" int d0g_wcscasecmp(const wchar_t *s1, const wchar_t *s2)
+int d0g_wcscasecmp(const wchar_t *s1, const wchar_t *s2)
 {
 	wchar_t c1, c2;
 	if (s1 == s2)
@@ -39,7 +39,7 @@ extern "C" int d0g_wcscasecmp(const wchar_t *s1, const wchar_t *s2)
 	return c1 - c2;
 }
 
-extern "C" int d0g_wcsncasecmp(const wchar_t *s1, const wchar_t *s2, size_t n)
+int d0g_wcsncasecmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
 	wchar_t c1, c2;
 	if ((s1 == s2) || !n)
