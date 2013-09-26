@@ -9,7 +9,7 @@
 
 #include <sys/system_properties.h>
 #include "tier0/platform.h"
-#include "android_core.h"
+#include "android_system.h"
 
 #define ANDR_LANGUAGE(l, h) ((l) | ((h) << 8))
 
