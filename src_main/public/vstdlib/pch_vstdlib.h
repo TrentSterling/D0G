@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
 //============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
 //
 // The copyright to the contents herein is the property of Valve, L.L.C.

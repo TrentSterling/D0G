@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
 //============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
 //
 // Purpose: Provide a class (SSE/SIMD only) holding a 2d matrix of class FourVectors,
