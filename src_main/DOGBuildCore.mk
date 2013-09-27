@@ -7,12 +7,12 @@ LOCAL_CFLAGS := -D_LINUX=(1) $(addprefix -D,$(DOG_C_DEFINES)) -ffast-math -fperm
 ifneq ($(DOG_LONG_WCHAR),true)
   LOCAL_CFLAGS += -DWCHAR_MAX=(65535) -DWCHAR_MIN=(0) -fshort-wchar
 endif
-ifneq ($(DOG_PROJECT),srcactivity)
+ifneq ($(DOG_PROJECT),android_launcher_main)
   LOCAL_CFLAGS += -fexceptions -frtti
 endif
 LOCAL_CFLAGS += -O2 -Wno-attributes -Wno-invalid-offsetof -Wno-write-strings $(DOG_CFLAGS)
-ifeq ($(DOG_PROJECT),srcactivity)
-  LOCAL_MODULE := srcactivity
+ifeq ($(DOG_PROJECT),android_launcher_main)
+  LOCAL_MODULE := android_launcher_main
 else
   LOCAL_MODULE := $(DOG_PROJECT)_android_$(DOG_LIBSUFFIX)
 endif
@@ -23,7 +23,7 @@ ifeq ($(DOG_STATIC_LIBRARY),true)
 else
   LOCAL_CFLAGS += -D_SHARED_LIB -D_USRDLL
   LOCAL_LDFLAGS := -shared -llog
-  ifneq ($(DOG_PROJECT),srcactivity)
+  ifneq ($(DOG_PROJECT),android_launcher_main)
     LOCAL_LDFLAGS += -L"$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)" -lgnustl_shared -lsupc++
   endif
   DOG_LIBRARIES_PREFIXED := $(addprefix -l,$(DOG_SYSTEM_LIBRARIES) $(addsuffix _android_$(DOG_LIBSUFFIX),$(DOG_PUBLIC_LIBRARIES)))
