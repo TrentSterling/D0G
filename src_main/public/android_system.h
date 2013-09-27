@@ -5,7 +5,10 @@
 //
 //===========================================================================//
 
-#ifdef __ANDROID__
+#if !defined(SRC_ANDROID_SYSTEM_H) && defined(__ANDROID__)
+#define SRC_ANDROID_SYSTEM_H
+
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
 PLATFORM_INTERFACE const char *ANDR_GetPackageName(void);
-#endif
+
+#endif // !SRC_ANDROID_SYSTEM_H && __ANDROID__
