@@ -7,4 +7,5 @@
 
 #ifdef __ANDROID__
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
+PLATFORM_INTERFACE const char *ANDR_GetPackageName(void);
 #endif

@@ -35,6 +35,8 @@
 #include "tier1/smartptr.h"
 #if defined( _X360 )
 #include "xbox\xbox_win32stubs.h"
+#elif defined(__ANDROID__)
+#include "android_system.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -328,7 +330,7 @@ static bool Sys_GetExecutableName( char *out, int len )
 		return false;
     }
 #elif defined(__ANDROID__)
-	strncpy(out, SRC_ANDROID_PACKAGE, len);
+	strncpy(out, ANDR_GetPackageName(), len);
 	out[len - 1] = '\0';
 #else
 	if ( CommandLine()->GetParm(0) )
@@ -613,27 +615,31 @@ static void FileSystem_AddLoadedSearchPath(
 #ifdef __ANDROID__
 static void FileSystem_AddAndroidOBB(CFSSearchPathsInit &initInfo, const char *pPathID)
 {
+	char dirPath[MAX_PATH], mainFormat[MAX_PATH], patchFormat[MAX_PATH];
+	const char *packageName = ANDR_GetPackageName();
 	int highestMain = -1, highestPatch = -1;
-
-	DIR *dirp = opendir("/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME);
+	strcpy(dirPath, "/mnt/sdcard/Android/obb/");
+	strcat(dirPath, packageName);
+	DIR *dirp = opendir(dirPath);
 	if (!dirp)
 		return;
+	sprintf(mainFormat, "main.%%i.%s.obb", packageName);
+	sprintf(patchFormat, "patch.%%i.%s.obb", packageName);
 	struct dirent *entry;
-	int i;
-
+	int cur;
 	while ((entry = readdir(dirp)) != NULL)
 	{
 		if (entry->d_type == DT_DIR)
 			continue;
-		if (sscanf(entry->d_name, "main.%i." SRC_ANDROID_PACKAGE_NAME ".obb", &i) == 1)
+		if (sscanf(entry->d_name, mainFormat, &cur) == 1)
 		{
-			if (i > highestMain)
-				highestMain = i;
+			if (cur > highestMain)
+				highestMain = cur;
 		}
-		else if (sscanf(entry->d_name, "patch.%i." SRC_ANDROID_PACKAGE_NAME ".obb", &i) == 1)
+		else if (sscanf(entry->d_name, patchFormat, &cur) == 1)
 		{
-			if (i > highestPatch)
-				highestPatch = i;
+			if (cur > highestPatch)
+				highestPatch = cur;
 		}
 	}
 	closedir(dirp);
@@ -642,15 +648,13 @@ static void FileSystem_AddAndroidOBB(CFSSearchPathsInit &initInfo, const char *p
 	if (highestPatch >= 0)
 	{
 		Q_snprintf(path, sizeof(path),
-			"/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME "/patch.%i." SRC_ANDROID_PACKAGE_NAME ".obb",
-			highestPatch);
+			"%s/patch.%i.%s.obb", dirPath, highestPatch, packageName);
 		initInfo.m_pFileSystem->AddPackFile(path, pPathID);
 	}
 	if (highestMain >= 0)
 	{
 		Q_snprintf(path, sizeof(path),
-			"/mnt/sdcard/Android/obb/" SRC_ANDROID_PACKAGE_NAME "/main.%i." SRC_ANDROID_PACKAGE_NAME ".obb",
-			highestMain);
+			"%s/main.%i.%s.obb", dirPath, highestMain, packageName);
 		initInfo.m_pFileSystem->AddPackFile(path, pPathID);
 	}
 }

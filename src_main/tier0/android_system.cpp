@@ -11,6 +11,8 @@
 #include "tier0/platform.h"
 #include "android_system.h"
 
+//---------------------------------------------------------
+
 #define ANDR_LANGUAGE(l, h) ((l) | ((h) << 8))
 
 struct ANDR_Language_t
@@ -56,5 +58,14 @@ const char *ANDR_GetLanguageString(void)
 	}
 	return "english";
 }
+
+//---------------------------------------------------------
+
+const char *ANDR_GetPackageName(void)
+{
+	return ANDR_PACKAGE_NAME; // Set during tier0 build, allows dynamic library reusage
+}
+
+//---------------------------------------------------------
 
 #endif
