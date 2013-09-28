@@ -128,6 +128,6 @@ PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()
 #ifdef __ANDROID__
 void Plat_DebugString(const char *psz)
 {
-	__android_log_print(ANDROID_LOG_INFO, "Debug", psz);
+	__android_log_print(ANDROID_LOG_INFO, "Debug", "%s", psz);
 }
 #endif

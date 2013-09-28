@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * D0G modifications © 2013, SiPlus, MIT licensed.
- *
  */
 
 #ifndef _ANDROID_NATIVE_APP_GLUE_H
@@ -313,7 +311,6 @@ enum {
     APP_CMD_DESTROY,
 };
 
-#ifdef ANDROID_NATIVE_APP_GLUE_FUNCTIONS
 /**
  * Call when ALooper_pollAll() returns LOOPER_ID_MAIN, reading the next
  * app command message.
@@ -344,7 +341,6 @@ void app_dummy();
  * the main entry to the app.
  */
 extern void android_main(struct android_app* app);
-#endif
 
 #ifdef __cplusplus
 }

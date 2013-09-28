@@ -3,14 +3,16 @@ LOCAL_C_INCLUDES := \
   "$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/include" \
   "$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)/include" \
   "$(DOG_SRC_MAIN)/common" "$(DOG_SRC_MAIN)/public" $(DOG_C_INCLUDES)
-LOCAL_CFLAGS := -D_LINUX=(1) $(addprefix -D,$(DOG_C_DEFINES)) -ffast-math -fpermissive 
+LOCAL_CFLAGS := -D_LINUX=(1) $(addprefix -D,$(DOG_C_DEFINES)) -ffast-math -O2 -Wno-attributes -Wno-write-strings
 ifneq ($(DOG_LONG_WCHAR),true)
   LOCAL_CFLAGS += -DWCHAR_MAX=(65535) -DWCHAR_MIN=(0) -fshort-wchar
 endif
+LOCAL_CPPFLAGS := -fpermissive -Wno-invalid-offsetof
 ifneq ($(DOG_PROJECT),android_launcher_main)
-  LOCAL_CFLAGS += -fexceptions -frtti
+  LOCAL_CPPFLAGS += -fexceptions -frtti
 endif
-LOCAL_CFLAGS += -O2 -Wno-attributes -Wno-invalid-offsetof -Wno-write-strings $(DOG_CFLAGS)
+LOCAL_CFLAGS += $(DOG_CFLAGS)
+LOCAL_CPPFLAGS += $(DOG_CPPFLAGS)
 ifeq ($(DOG_PROJECT),android_launcher_main)
   LOCAL_MODULE := android_launcher_main
 else
@@ -22,7 +24,7 @@ ifeq ($(DOG_STATIC_LIBRARY),true)
   include $(BUILD_STATIC_LIBRARY)
 else
   LOCAL_CFLAGS += -D_SHARED_LIB -D_USRDLL
-  LOCAL_LDFLAGS := -shared -llog
+  LOCAL_LDFLAGS := -shared -landroid -llog
   ifneq ($(DOG_PROJECT),android_launcher_main)
     LOCAL_LDFLAGS += -L"$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)" -lgnustl_shared -lsupc++
   endif

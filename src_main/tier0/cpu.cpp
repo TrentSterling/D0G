@@ -362,7 +362,7 @@ static unsigned char GetCPUCountFromPROC()
 	FILE *fp;
 	if (!(fp = fopen("/proc/cpuinfo", "r")))
 		return 1;
-	while (fgets(line, 1024, fp))
+	while (fgets(line, sizeof(line), fp))
 	{
 		if (!strncmp(line, search_str, sizeof(search_str) - 1))
 			++count;

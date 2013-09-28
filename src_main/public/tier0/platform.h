@@ -1034,8 +1034,6 @@ inline const char *GetPlatformExt( void )
 {
 	#if defined(_X360)
 		return ".360";
-	#elif defined(__ANDROID__)
-		return ".android";
 	#else
 		return "";
 	#endif

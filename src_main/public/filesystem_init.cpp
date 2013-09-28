@@ -350,8 +350,7 @@ bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
 {
 #ifdef __ANDROID__
 	char wd[PATH_MAX + 4];
-	if (!getwd(wd))
-		return false;
+	Q_getwd(wd, sizeof(wd));
 	strcat(wd, "/bin");
 	strncpy(exedir, wd, exeDirLen);
 	exedir[exeDirLen - 1] = '\0';
@@ -552,7 +551,7 @@ bool IsLowViolenceBuild( void )
 	return retVal;
 #elif _LINUX
 	return false;
-#elif
+#else
 	#error "Fix me"
 #endif
 }
@@ -972,10 +971,12 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 	}
 
 	// Try to use the environment variable / registry
+#ifndef __ANDROID__
 	if ( ( pProject = getenv( GAMEDIR_TOKEN ) ) != NULL &&
 		 ( Q_MakeAbsolutePath( pOutDir, outDirLen, pProject ), 1 ) &&
 		 FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, false ) )
 		return FS_OK;
+#endif
 
 	if ( IsPC() )
 	{
@@ -1039,9 +1040,9 @@ bool DoesPathExistAlready( const char *pPathEnvVar, const char *pTestPath )
 
 FSReturnCode_t SetSteamInstallPath( char *steamInstallPath, int steamInstallPathLen, CSteamEnvVars &steamEnvVars, bool bErrorsAsWarnings )
 {
-	if ( IsConsole() )
+	if (IsConsole() || IsAndroid())
 	{
-		// consoles don't use steam
+		// consoles and Android don't use steam
 		return FS_MISSING_STEAM_DLL;
 	}
 
@@ -1290,9 +1291,11 @@ FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 		return ret;
 
 	// This is so that processes spawned by this application will have the same VPROJECT
+#ifndef __ANDROID__
 	char pEnvBuf[MAX_PATH+32];
 	Q_snprintf( pEnvBuf, sizeof(pEnvBuf), "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
 	_putenv( pEnvBuf );
+#endif
 
 	CSteamEnvVars steamEnvVars;
 	if ( fsInfo.m_bSteam )

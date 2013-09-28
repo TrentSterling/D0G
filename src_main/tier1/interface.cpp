@@ -32,6 +32,7 @@
 #ifdef __ANDROID__
 #include <android/log.h>
 #include <errno.h>
+#include "android_system.h"
 #include "tier1/checksum_crc.h"
 #endif
 #define _getcwd getcwd
@@ -292,7 +293,11 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 	const char *pModuleAddition = "_i486.so"; // if an extension is on the filename assume the i486 binary set
 #endif
 	Q_strncpy( str, pLibraryName, sizeof(str) );
-	if ( !Q_stristr( str, pModuleExtension ) )
+#ifdef __ANDROID__
+	if (!Q_stristr(str, pModuleAddition))
+#else
+	if (!Q_stristr(str, pModuleExtension))
+#endif
 	{
 		if ( IsX360() )
 		{
@@ -333,11 +338,11 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 	V_strlower(androidBase);
 	const char *androidFmt;
 	if (!strncmp(androidBase, "lib", sizeof("lib") - 1))
-		androidFmt = "/data/data/" SRC_ANDROID_PACKAGE "/%s.so";
+		androidFmt = "/data/data/%s/files/%s.so";
 	else
-		androidFmt = "/data/data/" SRC_ANDROID_PACKAGE "/lib%s.so";
+		androidFmt = "/data/data/%s/files/lib%s.so";
 	char androidStr[1024];
-	Q_snprintf(androidStr, sizeof(androidStr), androidFmt, androidBase);
+	Q_snprintf(androidStr, sizeof(androidStr), androidFmt, ANDR_GetPackageName(), androidBase);
 	if (!Sys_AndroidCopyLibrary(str, androidStr))
 		return NULL;
 	HMODULE ret = dlopen(androidStr, RTLD_NOW);

@@ -26,38 +26,30 @@ THE SOFTWARE. */
 #ifndef _WIN32
 #include <strings.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 inline int _stricmp(const char *string1, const char *string2)
 {
-	strcasecmp(string1, string2);
+	return strcasecmp(string1, string2);
 }
 
 inline int stricmp(const char *string1, const char *string2)
 {
-	strcasecmp(string1, string2);
+	return strcasecmp(string1, string2);
 }
 
 inline int _strnicmp(const char *string1, const char *string2, size_t count)
 {
-	strncasecmp(string1, string2, count);
+	return strncasecmp(string1, string2, count);
 }
 
 inline int strnicmp(const char *string1, const char *string2, size_t count)
 {
-	strncasecmp(string1, string2, count);
+	return strncasecmp(string1, string2, count);
 }
 
 inline int strcmpi(const char *string1, const char *string2)
 {
-	strcasecmp(string1, string2);
+	return strcasecmp(string1, string2);
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // !_WIN32
 
