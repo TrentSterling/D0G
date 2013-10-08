@@ -7,6 +7,7 @@
 
 #ifdef __ANDROID__
 
+#include <cstd/string.h>
 #include <sys/system_properties.h>
 #include "tier0/platform.h"
 #include "android_system.h"
@@ -61,9 +62,16 @@ const char *ANDR_GetLanguageString(void)
 
 //---------------------------------------------------------
 
+char s_ANDR_PackageName[MAX_PATH];
+
 const char *ANDR_GetPackageName(void)
 {
-	return ANDR_PACKAGE_NAME; // Set during tier0 build, allows dynamic library reusage
+	return s_ANDR_PackageName;
+}
+
+void ANDR_SetPackageName(const char *packageName)
+{
+	strcpy(s_ANDR_PackageName, packageName);
 }
 
 //---------------------------------------------------------

@@ -10,5 +10,6 @@
 
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
 PLATFORM_INTERFACE const char *ANDR_GetPackageName(void);
+PLATFORM_INTERFACE void ANDR_SetPackageName(const char *packageName);
 
 #endif // !SRC_ANDROID_SYSTEM_H && __ANDROID__
