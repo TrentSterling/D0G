@@ -46,6 +46,12 @@
 // need this for _alloca
 #include <alloca.h>
 #define _alloca alloca
+// PATH_MAX define
+#ifdef __ANDROID__
+#include <linux/limits.h>
+#else
+#include <limits.h>
+#endif
 #endif // _LINUX
 
 #ifdef __arm__
