@@ -1811,19 +1811,13 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 //-----------------------------------------------------------------------------
 bool EvaluateConditional( const char *str )
 {
-	bool bResult = false;
-	bool bXboxUI = IsX360();
-
-	if ( bXboxUI )
-	{
-		bResult = !Q_stricmp( "[$X360]", str );
-	}
-	else
-	{
-		bResult = !Q_stricmp( "[$WIN32]", str );
-	}
-
-	return bResult;
+#if defined(__ANDROID__)
+	return !Q_stricmp("[$ANDROID]", str)
+#elif defined(_X360)
+	return !Q_stricmp("[$X360]", str)
+#else
+	return !Q_stricmp("[$WIN32]", str)
+#endif
 }
 
 
