@@ -1526,6 +1526,8 @@ FORCEINLINE void StoreAlignedSIMD(float * RESTRICT pSIMD, const fltx4 &a)
 	*((fltx4 *)pSIMD) = a;
 }
 
+// NEON needs 4-byte alignment for float32x4_t load/store, not 16-byte.
+// All places where unaligned load/store is used operate with floats.
 #define StoreUnalignedSIMD StoreAlignedSIMD
 
 FORCEINLINE void StoreAligned3SIMD(VectorAligned * RESTRICT pSIMD, const fltx4 &a)
