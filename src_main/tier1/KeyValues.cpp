@@ -1811,13 +1811,32 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 //-----------------------------------------------------------------------------
 bool EvaluateConditional( const char *str )
 {
-#if defined(__ANDROID__)
-	return !Q_stricmp("[$ANDROID]", str)
-#elif defined(_X360)
-	return !Q_stricmp("[$X360]", str)
-#else
-	return !Q_stricmp("[$WIN32]", str)
-#endif
+	if ( !str )
+		return false;
+
+	if ( *str == '[' )
+		str++;
+
+	bool bNot = false; // should we negate this command?
+	if ( *str == '!' )
+		bNot = true;
+
+	if ( Q_stristr( str, "$X360" ) )
+		return IsX360() ^ bNot;
+	if ( Q_stristr( str, "$WIN32" ) )
+		return IsPC() ^ bNot; // hack hack - for now WIN32 really means IsPC
+	if ( Q_stristr( str, "$WINDOWS" ) )
+		return IsWindows() ^ bNot;
+	if ( Q_stristr( str, "$OSX" ) )
+		return bNot;
+	if ( Q_stristr( str, "$LINUX" ) )
+		return IsLinux() ^ bNot;
+	if ( Q_stristr( str, "$ANDROID" ) )
+		return IsAndroid() ^ bNot;
+	if ( Q_stristr( str, "$POSIX" ) )
+		return (IsLinux() || IsAndroid()) ^ bNot;
+	
+	return false;
 }
 
 
