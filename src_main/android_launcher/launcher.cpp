@@ -182,10 +182,10 @@ extern "C" void LauncherMain(struct android_app *app)
 	mkdir(g_szBasedir, 0777);
 	strcat(g_szBasedir, "data/");
 	mkdir(g_szBasedir, 0777);
-	strcat(g_szBasedir, "files/");
-	mkdir(g_szBasedir, 0777);
 	strcat(g_szBasedir, packageName);
 	strcat(g_szBasedir, "/");
+	mkdir(g_szBasedir, 0777);
+	strcat(g_szBasedir, "files/");
 	mkdir(g_szBasedir, 0777);
 	if (chdir(g_szBasedir))
 		Error("LauncherMain: Couldn't change current directory");
