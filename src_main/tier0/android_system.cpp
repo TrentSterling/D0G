@@ -9,8 +9,19 @@
 
 #include <cstd/string.h>
 #include <sys/system_properties.h>
+#include "tier0/dbg.h"
 #include "tier0/platform.h"
 #include "android_system.h"
+
+ANativeActivity *s_ANDR_Activity;
+char s_ANDR_PackageName[MAX_PATH];
+
+//---------------------------------------------------------
+
+ANativeActivity *ANDR_GetActivity(void)
+{
+	return s_ANDR_Activity;
+}
 
 //---------------------------------------------------------
 
@@ -62,16 +73,40 @@ const char *ANDR_GetLanguageString(void)
 
 //---------------------------------------------------------
 
-char s_ANDR_PackageName[MAX_PATH];
-
 const char *ANDR_GetPackageName(void)
 {
 	return s_ANDR_PackageName;
 }
 
-void ANDR_SetPackageName(const char *packageName)
+//---------------------------------------------------------
+
+void ANDR_InitActivity(ANativeActivity *activity)
 {
+	Assert(!s_ANDR_Activity);
+	s_ANDR_Activity = activity;
+
+	JNIEnv *env = ANDR_JNIBegin();
+	jmethodID getPackageName = env->GetMethodID(env->GetObjectClass(activity->clazz),
+		"getPackageName", "()Ljava/lang/String;");
+	jstring packageNameHandle = (jstring)(env->CallObjectMethod(activity->clazz, getPackageName));
+	const char *packageName = env->GetStringUTFChars(packageNameHandle, NULL);
 	strcpy(s_ANDR_PackageName, packageName);
+	env->ReleaseStringUTFChars(packageNameHandle, packageName);
+	ANDR_JNIEnd();
+}
+
+//---------------------------------------------------------
+
+JNIEnv *ANDR_JNIBegin(void)
+{
+	JNIEnv *env = NULL; // To return NULL if the function fails (shouldn't really happen)
+	s_ANDR_Activity->vm->AttachCurrentThread(&env, NULL);
+	return env;
+}
+
+void ANDR_JNIEnd(void)
+{
+	s_ANDR_Activity->vm->DetachCurrentThread();
 }
 
 //---------------------------------------------------------

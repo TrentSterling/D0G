@@ -1823,10 +1823,8 @@ bool EvaluateConditional( const char *str )
 
 	if ( Q_stristr( str, "$X360" ) )
 		return IsX360() ^ bNot;
-	if ( Q_stristr( str, "$WIN32" ) )
+	if ( Q_stristr( str, "$WIN32" ) || Q_stristr( str, "$WINDOWS" ) )
 		return IsPC() ^ bNot; // hack hack - for now WIN32 really means IsPC
-	if ( Q_stristr( str, "$WINDOWS" ) )
-		return IsWindows() ^ bNot;
 	if ( Q_stristr( str, "$OSX" ) )
 		return bNot;
 	if ( Q_stristr( str, "$LINUX" ) )
