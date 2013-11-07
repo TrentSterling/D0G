@@ -16,7 +16,7 @@ LOCAL_CPPFLAGS += $(DOG_CPPFLAGS)
 ifeq ($(DOG_PROJECT),android_launcher_main)
   LOCAL_MODULE := android_launcher_main
 else
-  LOCAL_MODULE := $(DOG_PROJECT)_android_$(DOG_LIBSUFFIX)
+  LOCAL_MODULE := $(notdir $(DOG_PROJECT))_android_$(DOG_LIBSUFFIX)
 endif
 LOCAL_SHORT_COMMANDS := true
 LOCAL_SRC_FILES := $(DOG_SRC_FILES)
