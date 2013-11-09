@@ -26,7 +26,6 @@
 #include "tier1/tier1.h"
 #include "tier2/tier2.h"
 #include "tier3/tier3.h"
-#include "android_native_app_glue.h"
 #include "android_system.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -172,8 +171,7 @@ void RemoveSpuriousGameParameters()
 
 extern "C" void LauncherMain(struct android_app *app)
 {
-	ANDR_InitActivity(app->activity);
-	SetAppInstance(app);
+	ANDR_InitApp(app);
 	SpewOutputFunc(LauncherDefaultSpewFunc);
 
 	const char *packageName = ANDR_GetPackageName();

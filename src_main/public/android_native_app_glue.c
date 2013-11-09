@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * D0G modifications (C) 2013, SiPlus, MIT licensed.
+ *
  */
 
 #include <jni.h>
@@ -22,6 +24,7 @@
 #include <unistd.h>
 #include <sys/resource.h>
 
+#define _ANDROID_NATIVE_APP_GLUE_FUNCTIONS
 #include "android_native_app_glue.h"
 #include <android/log.h>
 

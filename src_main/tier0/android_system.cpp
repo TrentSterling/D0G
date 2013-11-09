@@ -13,14 +13,14 @@
 #include "tier0/platform.h"
 #include "android_system.h"
 
-ANativeActivity *s_ANDR_Activity;
+struct android_app *s_ANDR_App;
 char s_ANDR_PackageName[MAX_PATH];
 
 //---------------------------------------------------------
 
-ANativeActivity *ANDR_GetActivity(void)
+struct android_app *ANDR_GetApp(void)
 {
-	return s_ANDR_Activity;
+	return s_ANDR_App;
 }
 
 //---------------------------------------------------------
@@ -80,15 +80,15 @@ const char *ANDR_GetPackageName(void)
 
 //---------------------------------------------------------
 
-void ANDR_InitActivity(ANativeActivity *activity)
+void ANDR_InitApp(struct android_app *app)
 {
-	Assert(!s_ANDR_Activity);
-	s_ANDR_Activity = activity;
+	Assert(!s_ANDR_App);
+	s_ANDR_App = app;
 
 	JNIEnv *env = ANDR_JNIBegin();
-	jmethodID getPackageName = env->GetMethodID(env->GetObjectClass(activity->clazz),
+	jmethodID getPackageName = env->GetMethodID(env->GetObjectClass(app->activity->clazz),
 		"getPackageName", "()Ljava/lang/String;");
-	jstring packageNameHandle = (jstring)(env->CallObjectMethod(activity->clazz, getPackageName));
+	jstring packageNameHandle = (jstring)(env->CallObjectMethod(app->activity->clazz, getPackageName));
 	const char *packageName = env->GetStringUTFChars(packageNameHandle, NULL);
 	strcpy(s_ANDR_PackageName, packageName);
 	env->ReleaseStringUTFChars(packageNameHandle, packageName);
@@ -100,13 +100,13 @@ void ANDR_InitActivity(ANativeActivity *activity)
 JNIEnv *ANDR_JNIBegin(void)
 {
 	JNIEnv *env = NULL; // To return NULL if the function fails (shouldn't really happen)
-	s_ANDR_Activity->vm->AttachCurrentThread(&env, NULL);
+	s_ANDR_App->activity->vm->AttachCurrentThread(&env, NULL);
 	return env;
 }
 
 void ANDR_JNIEnd(void)
 {
-	s_ANDR_Activity->vm->DetachCurrentThread();
+	s_ANDR_App->activity->vm->DetachCurrentThread();
 }
 
 //---------------------------------------------------------

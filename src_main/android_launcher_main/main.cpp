@@ -5,7 +5,8 @@
 //
 //===========================================================================//
 
-#include <android_native_app_glue.h>
+#define _ANDROID_NATIVE_APP_GLUE_FUNCTIONS
+#include "android_native_app_glue.h"
 #include <android/log.h>
 #include <dlfcn.h>
 #include <linux/limits.h>

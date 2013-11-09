@@ -8,16 +8,16 @@
 #if !defined(SRC_ANDROID_SYSTEM_H) && defined(__ANDROID__)
 #define SRC_ANDROID_SYSTEM_H
 
-#include <android/native_activity.h>
+#include "android_native_app_glue.h"
 #include <jni.h>
 
-PLATFORM_INTERFACE ANativeActivity *ANDR_GetActivity(void);
+PLATFORM_INTERFACE struct android_app *ANDR_GetApp(void);
 
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
 
 PLATFORM_INTERFACE const char *ANDR_GetPackageName(void);
 
-PLATFORM_INTERFACE void ANDR_InitActivity(ANativeActivity *activity);
+PLATFORM_INTERFACE void ANDR_InitApp(struct android_app *app);
 
 // Must not be nested!
 PLATFORM_INTERFACE JNIEnv *ANDR_JNIBegin(void);

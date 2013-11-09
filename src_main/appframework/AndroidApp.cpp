@@ -12,9 +12,7 @@
 #include "appframework/iappsystemgroup.h"
 #include "filesystem_init.h"
 #include "vstdlib/cvar.h"
-#include "android_native_app_glue.h"
-
-struct android_app *s_AndroidApp;
+#include "android_system.h"
 
 SpewRetval_t AndroidAppDefaultSpewFunc(SpewType_t spewType, const char *pMsg)
 {
@@ -36,12 +34,11 @@ SpewOutputFunc_t g_DefaultSpewFunc = AndroidAppDefaultSpewFunc;
 
 void *GetAppInstance()
 {
-	return s_AndroidApp;
+	return ANDR_GetApp();
 }
 
 void SetAppInstance(void *hInstance)
 {
-	s_AndroidApp = (struct android_app *)(hInstance);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,10 +140,4 @@ void CSteamApplication::Shutdown()
 {
 	m_pChildAppSystemGroup->Shutdown();
 	BaseClass::Shutdown();
-}
-
-// Dummy to avoid undefined reference
-void android_main(struct android_app *app)
-{
-	app_dummy();
 }

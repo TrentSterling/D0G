@@ -10,7 +10,6 @@ DOG_PUBLIC_LIBRARIES := \
   tier3 \
   vstdlib
 DOG_SRC_FILES := \
-  ../public/android_native_app_glue.c \
   ../public/filesystem_init.cpp \
   launcher.cpp \
   ../public/tier0/memoverride.cpp
