@@ -102,12 +102,11 @@
 		#define IsPS3() false
 	#endif
 #elif defined(_LINUX)
-	#ifndef __ANDROID__
-		#define IsPC() true
-		#define IsAndroid() false
-	#else
-		#define IsPC() false
+	#define IsPC() true
+	#ifdef __ANDROID__
 		#define IsAndroid() true
+	#else
+		#define IsAndroid() false
 	#endif
 	#define IsConsole() false
 	#define IsX360() false

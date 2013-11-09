@@ -474,7 +474,9 @@ void KeyValues::UsesEscapeSequences(bool state)
 bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceName, const char *pathID )
 {
 	Assert(filesystem);
-	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+#if defined(_WIN32) && !defined(_X360)
+	Assert(_heapchk() == _HEAPOK);
+#endif
 
 	FileHandle_t f = filesystem->Open(resourceName, "rb", pathID);
 	if ( !f )
@@ -1824,7 +1826,7 @@ bool EvaluateConditional( const char *str )
 	if ( Q_stristr( str, "$X360" ) )
 		return IsX360() ^ bNot;
 	if ( Q_stristr( str, "$WIN32" ) || Q_stristr( str, "$WINDOWS" ) )
-		return IsPC() ^ bNot; // hack hack - for now WIN32 really means IsPC
+		return (IsPC() && !IsLinux()) ^ bNot; // hack hack - for now WIN32 really means IsPC
 	if ( Q_stristr( str, "$OSX" ) )
 		return bNot;
 	if ( Q_stristr( str, "$LINUX" ) )

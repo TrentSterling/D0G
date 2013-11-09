@@ -849,7 +849,7 @@ void COM_TimestampedLog( char const *fmt, ... )
 	XBX_rTimeStampLog( curStamp, string );
 #endif
 
-	if ( IsPC() || IsAndroid() )
+	if ( IsPC() )
 	{
 		if ( !s_bFirstWrite )
 		{

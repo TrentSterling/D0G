@@ -879,9 +879,6 @@ int CThreadPool::AbortAll()
 
 bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char *pszName )
 {
-	if ( IsLinux() )
-		return false;
-
 	int nThreads = startParams.nThreads;
 
 	if ( nThreads < 0 )
@@ -894,7 +891,7 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		else
 		{
 			nThreads = ( ci.m_nLogicalProcessors / (( ci.m_bHT ) ? 2 : 1) ) - 1; // One per
-			if ( IsPC() )
+			if ( IsPC() && !IsLinux() )
 			{
 				if ( nThreads > 3 )
 				{
