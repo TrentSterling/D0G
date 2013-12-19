@@ -1,6 +1,8 @@
 ﻿# D0G
 Say "rise and shine" to the robots!
 
+An attempt to port Half-Life 2 and Portal to Android tablets and consoles.
+
 ## Done
 ### Unreleased
 * VPhysics.
