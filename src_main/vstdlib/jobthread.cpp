@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose:
 //
@@ -921,17 +921,14 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		}
 	}
 
+#ifndef __ANDROID__
 	int priority = startParams.iThreadPriority;
 
 	if ( priority == SHRT_MIN )
 	{
 		if ( startParams.bIOThreads )
 		{
-#ifdef _WIN32
 			priority = THREAD_PRIORITY_HIGHEST;
-#else
-			priority = 99;
-#endif
 		}
 		else
 		{
@@ -948,6 +945,7 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	{
 		bDistribute = !startParams.bIOThreads;
 	}
+#endif
 
 	//--------------------------------------------------------
 
@@ -967,14 +965,16 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		m_Threads[iThread]->Start( nStackSize );
 		m_Threads[iThread]->GetIdleEvent().Wait();
 		ThreadSetDebugName( m_Threads[iThread]->GetThreadId(), CFmtStr( "%s%d", pszName, iThread ) );
-#ifdef _WIN32
+#if defined(_WIN32)
 		ThreadSetPriority( (ThreadHandle_t)m_Threads[iThread]->GetThreadHandle(), priority );
-#else
+#elif !defined(__ANDROID__)
 		ThreadSetPriority( (ThreadHandle_t)m_Threads[iThread]->GetThreadId(), priority );
 #endif
 	}
 
+#ifndef __ANDROID__
 	Distribute( bDistribute, startParams.bUseAffinityTable ? (int *)startParams.iAffinityTable : NULL );
+#endif
 
 	return true;
 }
@@ -983,6 +983,7 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 
 void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 {
+#ifndef __ANDROID__
 	if ( bDistribute )
 	{
 		const CPUInformation &ci = GetCPUInformation();
@@ -1036,19 +1037,11 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 				ThreadSetAffinity((ThreadHandle_t)m_Threads[i]->GetThreadHandle(), dwProcessAffinity);
 			}
 		}
-#elif defined(__ANDROID__)
-		uint32 dwProcessAffinity;
-		if (syscall(__NR_sched_getaffinity, getpid(), sizeof(uint32), &dwProcessAffinity) >= 0)
-		{
-			for (int i = 0; i < m_Threads.Count(); i++)
-			{
-				ThreadSetAffinity((ThreadHandle_t)m_Threads[i]->GetThreadId(), dwProcessAffinity);
-			}
-		}
 #else
 #error "Implement CThreadPool::Distribute"
 #endif
 	}
+#endif // !__ANDROID__
 }
 
 //---------------------------------------------------------

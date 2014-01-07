@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose:
 //
@@ -182,8 +182,7 @@ int CheckName(const struct dirent *dir)
 const char *findFileInDirCaseInsensitive(const char *file)
 {
 #ifdef __ANDROID__
-	if (!strncmp(file, "/mnt/sdcard/", sizeof("/mnt/sdcard/") - 1))
-		return file;
+	return file; // Most files are in sdcard, case-sensitive internal storage is for very specific cases.
 #endif
 	const char *dirSep = strrchr(file,'/');
 	if( !dirSep )

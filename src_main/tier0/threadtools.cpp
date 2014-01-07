@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose:
 //
@@ -27,7 +27,6 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <unistd.h>
 #ifdef __ANDROID__
 #include <linux/sched.h>
-#include <sys/syscall.h>
 #include "android_win32stubs.h"
 #endif
 #define GetLastError() errno
@@ -110,7 +109,6 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	pthread_create(&tid, &attr, ThreadProcConvert, new ThreadProcInfo_t(pfnThread, pParam));
 	if ( pID )
 		*pID = (ThreadId_t)tid;
-	ThreadSetPriority((ThreadHandle_t)tid, 50); // SCHED_RR
 	return (ThreadHandle_t)tid;
 #endif
 }
@@ -172,16 +170,14 @@ ThreadHandle_t ThreadGetCurrentHandle()
 
 int ThreadGetPriority( ThreadHandle_t hThread )
 {
-	if (!hThread)
-		hThread = ThreadGetCurrentHandle();
 #ifdef _WIN32
-	return ::GetThreadPriority((HANDLE)hThread);
+	if ( !hThread )
+	{
+		return ::GetThreadPriority( GetCurrentThread() );
+	}
+	return ::GetThreadPriority( (HANDLE)hThread );
 #else
-	struct sched_param param;
-	int policy;
-	if (pthread_getschedparam(hThread, &policy, &param))
-		return 50;
-	return param.sched_priority;
+	return 0;
 #endif
 }
 
@@ -189,16 +185,24 @@ int ThreadGetPriority( ThreadHandle_t hThread )
 
 bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 {
-	if (!hThread)
+#ifndef __ANDROID__ // Can't use SCHED_RR on Android.
+
+	if ( !hThread )
+	{
 		hThread = ThreadGetCurrentHandle();
-#if defined(_WIN32)
-	return (SetThreadPriority(hThread, priority) != 0);
+	}
+
+#ifdef _WIN32
+	return ( SetThreadPriority(hThread, priority) != 0 );
+#elif _LINUX
+	struct sched_param thread_param; 
+	thread_param.sched_priority = priority; 
+	pthread_setschedparam( hThread, SCHED_RR, &thread_param );
+	return true;
+#endif
+
 #else
-	struct sched_param thread_param;
-	thread_param.sched_priority = priority;
-	if (!priority)
-		return pthread_setschedparam(hThread, SCHED_BATCH, &thread_param) == 0;
-	return pthread_setschedparam(hThread, SCHED_RR, &thread_param) == 0;
+	return true;
 #endif
 }
 
@@ -206,26 +210,23 @@ bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 
 void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinityMask )
 {
-	if ( !hThread )
-	{
+#ifndef __ANDROID__ // pthread_setaffinity_np is not there.
+
+	if (!hThread)
 		hThread = ThreadGetCurrentHandle();
-	}
 
 #if defined(_WIN32)
 	SetThreadAffinityMask( hThread, nAffinityMask );
-#elif defined(__ANDROID__)
-	syscall(__NR_sched_setaffinity, hThread, sizeof(int), &nAffinityMask);
 #elif defined(_LINUX)
-	cpu_set_t cpuSet;
-	CPU_ZERO(cpuSet);
-	for( int i = 0 ; i < 32; i++ )
-	{
-		if (nAffinityMask & (1 << i))
-			CPU_SET(cpuSet, i);
-	}
-	sched_setaffinity(hThread, sizeof( cpuSet ), &cpuSet);
+// 	cpu_set_t cpuSet;
+// 	CPU_ZERO( cpuSet );
+// 	for( int i = 0 ; i < 32; i++ )
+// 	  if ( nAffinityMask & ( 1 << i ) )
+// 	    CPU_SET( cpuSet, i );
+// 	sched_setaffinity( hThread, sizeof( cpuSet ), &cpuSet );
 #endif
 
+#endif // !__ANDROID__
 }
 
 //-----------------------------------------------------------------------------
@@ -236,9 +237,7 @@ uint InitMainThread()
 #ifdef _WIN32
 	return ThreadGetCurrentId();
 #elif _LINUX
-	pthread_t tid = pthread_self();
-	ThreadSetPriority((ThreadHandle_t)tid, 50); // SCHED_RR
-	return tid;
+	return pthread_self();
 #endif
 }
 
@@ -1419,7 +1418,6 @@ bool CThread::Start( unsigned nBytesStack )
 		AssertMsg1( 0, "Failed to create thread (error 0x%x)", GetLastError() );
 		return false;
 	}
-	SetPriority(50); // SCHED_RR
 	bInitSuccess = true;
 #endif
 
@@ -1842,11 +1840,13 @@ unsigned CWorkerThread::GetCallParam() const
 
 int CWorkerThread::BoostPriority()
 {
+#ifndef __ANDROID__
 	int iInitialPriority = GetPriority();
 	const int iNewPriority = ThreadGetPriority();
 	if (iNewPriority > iInitialPriority)
 		SetPriority(iNewPriority);
 	return iInitialPriority;
+#endif
 }
 
 //---------------------------------------------------------
@@ -1875,15 +1875,13 @@ int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority,
 	if (!IsAlive())
 		return WTCR_FAIL;
 
-#ifdef _WIN32
+#ifndef __ANDROID__
 	int iInitialPriority = 0;
-#else
-	int iInitialPriority = 50;
-#endif
 	if (fBoostPriority)
 	{
 		iInitialPriority = BoostPriority();
 	}
+#endif
 
 	// set the parameter, signal the worker thread, wait for the completion to be signaled
 	m_Param = dwParam;
@@ -1893,8 +1891,10 @@ int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority,
 
 	WaitForReply( timeout, pfnWait );
 
+#ifndef __ANDROID__
 	if (fBoostPriority)
 		SetPriority(iInitialPriority);
+#endif
 
 	return m_ReturnVal;
 }

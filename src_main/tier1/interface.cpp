@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -32,8 +32,8 @@
 #ifdef __ANDROID__
 #include <android/log.h>
 #include <errno.h>
+#include <sys/stat.h>
 #include "android_system.h"
-#include "tier1/checksum_crc.h"
 #endif
 #define _getcwd getcwd
 #endif
@@ -178,93 +178,38 @@ unsigned ThreadedLoadLibraryFunc( void *pParam )
 #endif
 
 #ifdef __ANDROID__
-// Copies library to application data because sdcard is noexec
-static bool Sys_AndroidCopyLibrary(const char *src, const char *dest)
+// Copies library to application data because sdcard is noexec.
+static void Sys_AndroidCopyLibrary(const char *src, const char *dest)
 {
-	unsigned char buf[32768];
-	int i, inputSize;
+	FILE *output = fopen(dest, "wb");
+	if (!output)
+		return; // Possibly already open - don't copy again then.
 
 	FILE *input = fopen(src, "rb");
 	if (!input)
-		return false;
-	fseek(input, 0, SEEK_END);
-	inputSize = ftell(input);
-	rewind(input);
-
-	FILE *output = fopen(dest, "rb");
-	if (!output)
-		goto copylib;
-	fseek(output, 0, SEEK_END);
-	if (ftell(output) != inputSize)
 	{
 		fclose(output);
-		goto copylib;
+		return;
 	}
-
-	// Do not overwrite if the files are the same
-	// (when called multiple times, for example)
-
-	CRC32_t inputCRC;
-	CRC32_Init(&inputCRC);
-	i = inputSize;
-	while (i >= sizeof(buf))
-	{
-		fread(buf, sizeof(buf), 1, input);
-		CRC32_ProcessBuffer(&inputCRC, buf, sizeof(buf));
-		i -= sizeof(buf);
-	}
-	if (i)
-	{
-		fread(buf, i, 1, input);
-		CRC32_ProcessBuffer(&inputCRC, buf, i);
-	}
-	CRC32_Final(&inputCRC);
+	fseek(input, 0, SEEK_END);
+	int size = ftell(input);
 	rewind(input);
 
-	CRC32_t outputCRC;
-	CRC32_Init(&outputCRC);
-	i = inputSize;
-	while (i >= sizeof(buf))
-	{
-		fread(buf, sizeof(buf), 1, output);
-		CRC32_ProcessBuffer(&outputCRC, buf, sizeof(buf));
-		i -= sizeof(buf);
-	}
-	if (i)
-	{
-		fread(buf, i, 1, output);
-		CRC32_ProcessBuffer(&outputCRC, buf, i);
-	}
-	CRC32_Final(&outputCRC);
-	fclose(output);
-
-	if (inputCRC == outputCRC)
-	{
-		fclose(input);
-		return true;
-	}
-
-copylib:
-	output = fopen(dest, "wb");
-	if (!output)
-	{
-		fclose(input);
-		return false;
-	}
-	while (inputSize >= sizeof(buf))
+	unsigned char buf[32768];
+	while (size >= sizeof(buf))
 	{
 		fread(buf, sizeof(buf), 1, input);
 		fwrite(buf, sizeof(buf), 1, output);
-		inputSize -= sizeof(buf);
+		size -= sizeof(buf);
 	}
-	if (inputSize)
+	if (size)
 	{
-		fread(buf, inputSize, 1, input);
-		fwrite(buf, inputSize, 1, output);
+		fread(buf, size, 1, input);
+		fwrite(buf, size, 1, output);
 	}
-	fclose(output);
+
 	fclose(input);
-	return true;
+	fclose(output);
 }
 #endif
 
@@ -299,7 +244,7 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 	if (!Q_stristr(str, pModuleExtension))
 #endif
 	{
-		if ( IsX360() )
+		if (IsX360() || IsAndroid())
 		{
 			Q_StripExtension( str, str, sizeof(str) );
 		}
@@ -333,18 +278,19 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 
 #elif _LINUX
 #ifdef __ANDROID__
+	const char *internalDataPath = ANDR_GetApp()->activity->internalDataPath;
+	mkdir(internalDataPath, 0777);
 	char androidBase[1024];
 	V_FileBase(str, androidBase, 1024);
 	V_strlower(androidBase);
 	const char *androidFmt;
 	if (!strncmp(androidBase, "lib", sizeof("lib") - 1))
-		androidFmt = "/data/data/%s/files/%s.so";
+		androidFmt = "%s/%s.so";
 	else
-		androidFmt = "/data/data/%s/files/lib%s.so";
+		androidFmt = "%s/lib%s.so";
 	char androidStr[1024];
-	Q_snprintf(androidStr, sizeof(androidStr), androidFmt, ANDR_GetPackageName(), androidBase);
-	if (!Sys_AndroidCopyLibrary(str, androidStr))
-		return NULL;
+	Q_snprintf(androidStr, sizeof(androidStr), androidFmt, internalDataPath, androidBase);
+	Sys_AndroidCopyLibrary(str, androidStr);
 	HMODULE ret = dlopen(androidStr, RTLD_NOW);
 #else
 	HMODULE ret = dlopen( str, RTLD_NOW );

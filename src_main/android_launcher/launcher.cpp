@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: Defines the entry point for the application.
 //
@@ -176,14 +176,7 @@ extern "C" void LauncherMain(struct android_app *app)
 
 	const char *packageName = ANDR_GetPackageName();
 
-	strcpy(g_szBasedir, "/mnt/sdcard/Android/");
-	mkdir(g_szBasedir, 0777);
-	strcat(g_szBasedir, "data/");
-	mkdir(g_szBasedir, 0777);
-	strcat(g_szBasedir, packageName);
-	strcat(g_szBasedir, "/");
-	mkdir(g_szBasedir, 0777);
-	strcat(g_szBasedir, "files/");
+	strcpy(g_szBasedir, app->activity->externalDataPath);
 	mkdir(g_szBasedir, 0777);
 	if (chdir(g_szBasedir))
 		Error("LauncherMain: Couldn't change current directory");
@@ -192,7 +185,7 @@ extern "C" void LauncherMain(struct android_app *app)
 
 	{
 		char commandLine[512];
-		strcpy(commandLine, packageName);
+		strcpy(commandLine, ANDR_GetPackageName());
 		size_t length = strlen(commandLine);
 		FILE *f = fopen("commandline.txt", "rb");
 		if (f)

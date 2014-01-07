@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: CBaseFileSystem Async Operation
 //
@@ -38,17 +38,19 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if defined(_LINUX) && !defined(__ANDROID__)
+// D0GTODO: IMPORANT - Find out why TPM_SUSPEND/EXIT are never reached on 2+ cores (or real devices)!!!
+#if defined(_LINUX) // && !defined(__ANDROID__)
 #define DISABLE_ASYNC
 #endif
 
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-ConVar async_mode( "async_mode", "0", 0, "Set the async filesystem mode (0 = async, 1 = synchronous)" );
-#define GetAsyncMode() ( (FSAsyncMode_t)( async_mode.GetInt() ) )
 
 #ifndef DISABLE_ASYNC
+
+ConVar async_mode( "async_mode", "0", 0, "Set the async filesystem mode (0 = async, 1 = synchronous)" );
+#define GetAsyncMode() ( (FSAsyncMode_t)( async_mode.GetInt() ) )
 
 #ifndef _RETAIL
 
@@ -322,14 +324,14 @@ public:
 			MemAlloc_PushAllocDbgInfo( m_pszAllocCreditFile, m_nAllocCreditLine );
 #endif
 
-		int iPrevPriority = ThreadGetPriority();
 #if defined(_WIN32)
+		int iPrevPriority = ThreadGetPriority();
 		ThreadSetPriority(2);
-#else
-		ThreadSetPriority(99);
 #endif
 		JobStatus_t retval = BaseFileSystem()->SyncRead( *this );
+#if defined(_WIN32)
 		ThreadSetPriority( iPrevPriority );
+#endif
 
 #if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
 		if ( m_pszAllocCreditFile )
@@ -589,6 +591,10 @@ void CBaseFileSystem::InitAsync()
 	Assert( !m_pThreadPool );
 	if ( m_pThreadPool )
 		return;
+
+#ifdef __ANDROID__
+	return; // Simulate -noasync. Read the note near DISABLE_ASYNC.
+#endif
 
 	if ( IsX360() && !IsRetail() && Plat_IsInDebugSession() )
 	{

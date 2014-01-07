@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -614,18 +614,36 @@ static void FileSystem_AddLoadedSearchPath(
 #ifdef __ANDROID__
 static void FileSystem_AddAndroidOBB(CFSSearchPathsInit &initInfo, const char *pPathID)
 {
-	char dirPath[MAX_PATH], mainFormat[MAX_PATH], patchFormat[MAX_PATH];
 	const char *packageName = ANDR_GetPackageName();
-	int highestMain = -1, highestPatch = -1;
-	strcpy(dirPath, "/mnt/sdcard/Android/obb/");
-	strcat(dirPath, packageName);
+
+	char dirPath[MAX_PATH];
+	{
+		JNIEnv *env = ANDR_JNIBegin();
+		if (!env)
+			return;
+		jclass environment = env->FindClass("android/os/Environment");
+		jmethodID getExternalStorageDirectory = env->GetStaticMethodID(environment,
+			"getExternalStorageDirectory", "()Ljava/io/File;");
+		jobject dirFile = env->CallStaticObjectMethod(environment, getExternalStorageDirectory);
+		jmethodID getAbsolutePath = env->GetMethodID(env->FindClass("java/io/File"),
+			"getAbsolutePath", "()Ljava/lang/String;");
+		jstring dirPathHandle = (jstring)(env->CallObjectMethod(dirFile, getAbsolutePath));
+		const char *dirPathChars = env->GetStringUTFChars(dirPathHandle, NULL);
+		snprintf(dirPath, MAX_PATH, "%s/Android/obb/%s", dirPathChars, packageName);
+		env->ReleaseStringUTFChars(dirPathHandle, dirPathChars);
+		ANDR_JNIEnd();
+	}
+
 	DIR *dirp = opendir(dirPath);
 	if (!dirp)
 		return;
+
+	char mainFormat[MAX_PATH], patchFormat[MAX_PATH];
 	sprintf(mainFormat, "main.%%i.%s.obb", packageName);
 	sprintf(patchFormat, "patch.%%i.%s.obb", packageName);
+
 	struct dirent *entry;
-	int cur;
+	int cur, highestMain = -1, highestPatch = -1;
 	while ((entry = readdir(dirp)) != NULL)
 	{
 		if (entry->d_type == DT_DIR)
@@ -706,7 +724,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	{
 		const char *pPathID = pCur->GetName();
 		const char *pLocation = pCur->GetString();
-		
+
 		if (Q_stristr(pLocation, ANDROIDOBB_TOKEN) == pLocation)
 		{
 #ifdef __ANDROID__

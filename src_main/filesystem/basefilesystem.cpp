@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -3082,7 +3082,7 @@ long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileNa
 		{
 			return buf.st_mtime;
 		}
-#ifdef _LINUX
+#if defined(_LINUX) && !defined(__ANDROID__)
 		const char *realName = findFileInDirCaseInsensitive( pTmpFileName );
 		if ( realName && FS_stat( realName, &buf ) != -1 )
 		{
@@ -3131,7 +3131,7 @@ int CBaseFileSystem::FastFindFile( const CSearchPath *path, const char *pFileNam
 
 			return buf.st_size;
 		}
-#ifdef _LINUX
+#if defined(_LINUX) && !defined(__ANDROID__)
 		const char *realName = findFileInDirCaseInsensitive( pTmpFileName );
 		if ( realName && FS_stat( realName, &buf ) != -1 )
 		{
