@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: Android definitions
 //
@@ -12,11 +12,9 @@
 #include <jni.h>
 
 PLATFORM_INTERFACE struct android_app *ANDR_GetApp(void);
-
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
-
+PLATFORM_INTERFACE const char *ANDR_GetLibraryPath(void);
 PLATFORM_INTERFACE const char *ANDR_GetPackageName(void);
-
 PLATFORM_INTERFACE void ANDR_InitApp(struct android_app *app);
 
 // Must not be nested!

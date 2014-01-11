@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: Android
 //
@@ -15,6 +15,7 @@
 
 struct android_app *s_ANDR_App;
 char s_ANDR_PackageName[MAX_PATH];
+char s_ANDR_LibraryPath[MAX_PATH];
 
 //---------------------------------------------------------
 
@@ -73,6 +74,13 @@ const char *ANDR_GetLanguageString(void)
 
 //---------------------------------------------------------
 
+const char *ANDR_GetLibraryPath(void)
+{
+	return s_ANDR_LibraryPath;
+}
+
+//---------------------------------------------------------
+
 const char *ANDR_GetPackageName(void)
 {
 	return s_ANDR_PackageName;
@@ -86,12 +94,33 @@ void ANDR_InitApp(struct android_app *app)
 	s_ANDR_App = app;
 
 	JNIEnv *env = ANDR_JNIBegin();
-	jmethodID getPackageName = env->GetMethodID(env->GetObjectClass(app->activity->clazz),
-		"getPackageName", "()Ljava/lang/String;");
-	jstring packageNameHandle = (jstring)(env->CallObjectMethod(app->activity->clazz, getPackageName));
-	const char *packageName = env->GetStringUTFChars(packageNameHandle, NULL);
-	strcpy(s_ANDR_PackageName, packageName);
-	env->ReleaseStringUTFChars(packageNameHandle, packageName);
+
+	jclass clazz = env->GetObjectClass(app->activity->clazz);
+
+	// s_ANDR_PackageName = activity.getPackageName();
+	{
+		jmethodID getPackageName = env->GetMethodID(clazz, "getPackageName", "()Ljava/lang/String;");
+		jstring packageNameHandle = (jstring)(env->CallObjectMethod(app->activity->clazz, getPackageName));
+		const char *packageName = env->GetStringUTFChars(packageNameHandle, NULL);
+		strcpy(s_ANDR_PackageName, packageName);
+		env->ReleaseStringUTFChars(packageNameHandle, packageName);
+	}
+
+	// s_ANDR_LibraryPath = activity.getApplicationContext().getApplicationInfo().nativeLibraryDir;
+	{
+		jmethodID getApplicationContext = env->GetMethodID(clazz, "getApplicationContext", "()Landroid/content/Context;");
+		jobject context = env->CallObjectMethod(app->activity->clazz, getApplicationContext);
+		jmethodID getApplicationInfo = env->GetMethodID(env->FindClass("android/content/Context"),
+			"getApplicationInfo", "()Landroid/content/pm/ApplicationInfo;");
+		jobject info = env->CallObjectMethod(app->activity->clazz, getApplicationInfo);
+		jfieldID dirField = env->GetFieldID(env->GetObjectClass(info), "nativeLibraryDir", "Ljava/lang/String;");
+		jstring dirHandle = (jstring)(env->GetObjectField(info, dirField));
+		const char *dir = env->GetStringUTFChars(dirHandle, NULL);
+		strcpy(s_ANDR_LibraryPath, dir);
+		strcat(s_ANDR_LibraryPath, "/");
+		env->ReleaseStringUTFChars(dirHandle, dir);
+	}
+
 	ANDR_JNIEnd();
 }
 

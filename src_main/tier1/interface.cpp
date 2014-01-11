@@ -178,7 +178,7 @@ unsigned ThreadedLoadLibraryFunc( void *pParam )
 #endif
 
 #ifdef __ANDROID__
-// Copies library to application data because sdcard is noexec.
+// Copies library to the internal storage because sdcard is noexec.
 static void Sys_AndroidCopyLibrary(const char *src, const char *dest)
 {
 	FILE *output = fopen(dest, "wb");
@@ -278,20 +278,34 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName )
 
 #elif _LINUX
 #ifdef __ANDROID__
-	const char *internalDataPath = ANDR_GetApp()->activity->internalDataPath;
-	mkdir(internalDataPath, 0777);
-	char androidBase[1024];
-	V_FileBase(str, androidBase, 1024);
+	const char prefix[] = "lib";
+	const int prefixLength = sizeof(prefix) - 1;
+
+	char androidBase[MAX_PATH];
+	V_FileBase(str, androidBase, MAX_PATH - prefixLength);
 	V_strlower(androidBase);
-	const char *androidFmt;
-	if (!strncmp(androidBase, "lib", sizeof("lib") - 1))
-		androidFmt = "%s/%s.so";
-	else
-		androidFmt = "%s/lib%s.so";
-	char androidStr[1024];
-	Q_snprintf(androidStr, sizeof(androidStr), androidFmt, internalDataPath, androidBase);
-	Sys_AndroidCopyLibrary(str, androidStr);
-	HMODULE ret = dlopen(androidStr, RTLD_NOW);
+	if (strncmp(androidBase, prefix, prefixLength))
+	{
+		memmove(androidBase + prefixLength, androidBase, strlen(androidBase) + 1);
+		memcpy(androidBase, prefix, prefixLength);
+	}
+	strcat(androidBase, ".so");
+
+	// Try to load from nativeLibraryPath.
+	char androidPath[MAX_PATH];
+	strcpy(androidPath, ANDR_GetLibraryPath());
+	strcat(androidPath, androidBase);
+	HMODULE ret = dlopen(androidPath, RTLD_NOW);
+	if (!ret)
+	{
+		// For mods - copy the library to the internal storage.
+		strcpy(androidPath, ANDR_GetApp()->activity->internalDataPath);
+		strcat(androidPath, "/");
+		mkdir(androidPath, 0777);
+		strcat(androidPath, androidBase);
+		Sys_AndroidCopyLibrary(str, androidPath);
+		ret = dlopen(androidPath, RTLD_NOW);
+	}
 #else
 	HMODULE ret = dlopen( str, RTLD_NOW );
 #endif
