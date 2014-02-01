@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -80,7 +80,7 @@ enum ImageFormat
 	IMAGE_FORMAT_ATI2N,			// One-surface ATI2N / DXN format
 	IMAGE_FORMAT_ATI1N,			// Two-surface ATI1N format
 
-#if defined( _X360 )
+#if defined(_X360)
 	// Depth-stencil texture formats
 	IMAGE_FORMAT_X360_DST16,
 	IMAGE_FORMAT_X360_DST24,
@@ -99,6 +99,10 @@ enum ImageFormat
 
 	IMAGE_FORMAT_LE_BGRX8888,
 	IMAGE_FORMAT_LE_BGRA8888,
+#else if defined(__ANDROID__)
+	IMAGE_FORMAT_ATC_RGB,
+	IMAGE_FORMAT_ATC_RGBA_EXPLICIT_ALPHA,
+	IMAGE_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA,
 #endif
 
 	NUM_IMAGE_FORMATS
