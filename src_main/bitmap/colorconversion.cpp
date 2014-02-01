@@ -1172,7 +1172,7 @@ FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *ds
 }
 
 // DXT1 to ATC_RGB - DXT1 with alpha does NOT work!
-void ConvertImageFormat_DXTToATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
+void ConvertImageFormat_DXT_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
 	const DXTColBlock *src = (const DXTColBlock *)src_;
@@ -1183,7 +1183,7 @@ void ConvertImageFormat_DXTToATCRGB(const uint8 *src_, uint8 *dst_, int width, i
 }
 
 // DXT3/5 to ATC_RGBA_EXPLICIT/INTERPOLATED_ALPHA
-void ConvertImageFormat_DXTToATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
+void ConvertImageFormat_DXT_To_ATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
 	int i;
@@ -1415,13 +1415,13 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 	else if ((dstImageFormat == IMAGE_FORMAT_ATC_RGB) && (srcImageFormat == IMAGE_FORMAT_DXT1))
 	{
 		// Assuming that will never be called with alpha (used only by Shader API for textures, which takes care of that).
-		ConvertImageFormat_DXTToATCRGB(src, dst, width, height);
+		ConvertImageFormat_DXT_To_ATCRGB(src, dst, width, height);
 		return true;
 	}
 	else if (((dstImageFormat == IMAGE_FORMAT_ATC_RGBA_EXPLICIT_ALPHA) && (srcImageFormat == IMAGE_FORMAT_DXT3)) ||
 			 ((dstImageFormat == IMAGE_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA) && (srcImageFormat == IMAGE_FORMAT_DXT5)))
 	{
-		ConvertImageFormat_DXTToATCRGBA(src, dst, width, height);
+		ConvertImageFormat_DXT_To_ATCRGBA(src, dst, width, height);
 		return true;
 	}
 #endif
