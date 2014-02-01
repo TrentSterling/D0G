@@ -1152,7 +1152,7 @@ void ConvertImageFormat_RGBA16161616F_To_RGBA16161616( float16 *pSrcImage, unsig
 
 #ifdef __ANDROID__
 // Based on "A Method for Load-Time Conversion of DXTC Assets to ATC" by Ray Ratelis and John Bergman, Guild Software, Inc.
-// http://guildsoftware.com/papers/2012.Converting.DXTC.to.ATC.pdf
+// http://www.guildsoftware.com/papers/2012.Converting.DXTC.to.ATC.pdf
 
 FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *dst)
 {
