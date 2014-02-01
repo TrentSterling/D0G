@@ -1151,7 +1151,7 @@ void ConvertImageFormat_RGBA16161616F_To_RGBA16161616( float16 *pSrcImage, unsig
 }
 
 #ifdef __ANDROID__
-// From "A Method for Load-Time Conversion of DXTC Assets to ATC" by Ray Ratelis and John Bergman, Guild Software, Inc.
+// Based on "A Method for Load-Time Conversion of DXTC Assets to ATC" by Ray Ratelis and John Bergman, Guild Software, Inc.
 // http://guildsoftware.com/papers/2012.Converting.DXTC.to.ATC.pdf
 
 FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *dst)
@@ -1160,19 +1160,42 @@ FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *ds
 	dst->col0 = ((col0 & 0xf800) >> 1) | ((col0 & 0x7c0) >> 1) | (col0 & 0x1f);
 	dst->col1 = src->col1;
 
-	const int shift[] = {0, 3, 1, 2};
-	int row = src->row[0];
-	dst->row[0] = shift[row & 3] | (shift[(row >> 2) & 3] << 2) | (shift[(row >> 4) & 3] << 4) | (shift[row >> 6] << 6);
-	row = src->row[1];
-	dst->row[1] = shift[row & 3] | (shift[(row >> 2) & 3] << 2) | (shift[(row >> 4) & 3] << 4) | (shift[row >> 6] << 6);
-	row = src->row[2];
-	dst->row[2] = shift[row & 3] | (shift[(row >> 2) & 3] << 2) | (shift[(row >> 4) & 3] << 4) | (shift[row >> 6] << 6);
-	row = src->row[3];
-	dst->row[3] = shift[row & 3] | (shift[(row >> 2) & 3] << 2) | (shift[(row >> 4) & 3] << 4) | (shift[row >> 6] << 6);
+	const int s[] = {0, 3, 1, 2};
+	uint32 r = *((const uint32 *)(src->row));
+	dst->row[0] = s[r         & 3] | (s[(r >>  2) & 3] << 2) | (s[(r >>  4) & 3] << 4) | (s[r >>  6] << 6);
+	dst->row[1] = s[(r >> 8)  & 3] | (s[(r >> 10) & 3] << 2) | (s[(r >> 12) & 3] << 4) | (s[r >> 14] << 6);
+	dst->row[2] = s[(r >> 16) & 3] | (s[(r >> 18) & 3] << 2) | (s[(r >> 20) & 3] << 4) | (s[r >> 22] << 6);
+	dst->row[3] = s[(r >> 24) & 3] | (s[(r >> 26) & 3] << 2) | (s[(r >> 28) & 3] << 4) | (s[r >> 30] << 6);
 }
 
-// DXT1 to ATC_RGB - DXT1 with alpha does NOT work!
-void ConvertImageFormat_DXT_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
+FORCEINLINE static void DXTColBlockToATCExplicitAlpha(const DXTColBlock *src, uint32 *dst)
+{
+	if (src->col0 > src->col1)
+	{
+		dst[0] = dst[1] = 0xffffffff;
+		return;
+	}
+
+	int i;
+	uint32 r = *((const uint32 *)(src->row));
+
+	dst[0] = 0;
+	for (i = 0; i < 32; i += 2)
+	{
+		dst[0] |= (((r & 3) == 3) ? 0 : 0xf) << i;
+		r >>= 2;
+	}
+
+	dst[1] = 0;
+	for (i = 0; i < 32; i += 2)
+	{
+		dst[1] |= (((r & 3) == 3) ? 0 : 0xf) << i;
+		r >>= 2;
+	}
+}
+
+// DXT1 to ATC_RGB.
+void ConvertImageFormat_DXT1_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
 	const DXTColBlock *src = (const DXTColBlock *)src_;
@@ -1182,8 +1205,21 @@ void ConvertImageFormat_DXT_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width,
 		DXTColBlockToATC(src++, dst++);
 }
 
-// DXT3/5 to ATC_RGBA_EXPLICIT/INTERPOLATED_ALPHA
-void ConvertImageFormat_DXT_To_ATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
+// DXT1 to ATC_RGBA_EXPLICIT_ALPHA.
+void ConvertImageFormat_DXT1_To_ATCRGBA(const uint8 *src_, uint8 *dst, int width, int height)
+{
+	Assert(!(width & 3) && !(height & 3));
+	const DXTColBlock *src = (const DXTColBlock *)src_;
+	int i;
+	for (i = (width * height) >> 4; i-- > 0; ++src, dst += 16)
+	{
+		DXTColBlockToATCExplicitAlpha(src, (uint32 *)dst);
+		DXTColBlockToATC(src, (DXTColBlock *)(dst + 8));
+	}
+}
+
+// DXT3/5 to ATC_RGBA_EXPLICIT/INTERPOLATED_ALPHA.
+void ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
 	int i;
@@ -1412,16 +1448,32 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		return false;
 	}
 #ifdef __ANDROID__
-	else if ((dstImageFormat == IMAGE_FORMAT_ATC_RGB) && (srcImageFormat == IMAGE_FORMAT_DXT1))
+	else if (dstImageFormat == IMAGE_FORMAT_ATC)
 	{
-		// Assuming that will never be called with alpha (used only by Shader API for textures, which takes care of that).
-		ConvertImageFormat_DXT_To_ATCRGB(src, dst, width, height);
+		if (srcImageFormat != IMAGE_FORMAT_DXT1)
+			return false;
+		ConvertImageFormat_DXT1_To_ATCRGB(src, dst, width, height);
 		return true;
 	}
-	else if (((dstImageFormat == IMAGE_FORMAT_ATC_RGBA_EXPLICIT_ALPHA) && (srcImageFormat == IMAGE_FORMAT_DXT3)) ||
-			 ((dstImageFormat == IMAGE_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA) && (srcImageFormat == IMAGE_FORMAT_DXT5)))
+	else if (dstImageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA)
 	{
-		ConvertImageFormat_DXT_To_ATCRGBA(src, dst, width, height);
+		if (srcImageFormat == IMAGE_FORMAT_DXT1_ONEBITALPHA)
+		{
+			ConvertImageFormat_DXT1_To_ATCRGBA(src, dst, width, height);
+			return true;
+		}
+		if (srcImageFormat == IMAGE_FORMAT_DXT3)
+		{
+			ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
+			return true;
+		}
+		return false;
+	}
+	else if (dstImageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA)
+	{
+		if (srcImageFormat != IMAGE_FORMAT_DXT5)
+			return false;
+		ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
 		return true;
 	}
 #endif
