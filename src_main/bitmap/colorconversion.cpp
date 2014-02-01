@@ -1194,7 +1194,7 @@ FORCEINLINE static void DXTColBlockToATCExplicitAlpha(const DXTColBlock *src, ui
 	}
 }
 
-// DXT1 to ATC_RGB.
+// DXT1 to ATC.
 void ConvertImageFormat_DXT1_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
@@ -1205,7 +1205,7 @@ void ConvertImageFormat_DXT1_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width
 		DXTColBlockToATC(src++, dst++);
 }
 
-// DXT1 to ATC_RGBA_EXPLICIT_ALPHA.
+// DXT1 to ATC_EXPLICITALPHA.
 void ConvertImageFormat_DXT1_To_ATCRGBA(const uint8 *src_, uint8 *dst, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
@@ -1218,7 +1218,7 @@ void ConvertImageFormat_DXT1_To_ATCRGBA(const uint8 *src_, uint8 *dst, int width
 	}
 }
 
-// DXT3/5 to ATC_RGBA_EXPLICIT/INTERPOLATED_ALPHA.
+// DXT3/5 to ATC_EXPLICITALPHA/INTERPOLATEDALPHA.
 void ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
 {
 	Assert(!(width & 3) && !(height & 3));
