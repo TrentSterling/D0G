@@ -1180,14 +1180,14 @@ FORCEINLINE static void DXTColBlockToATCExplicitAlpha(const DXTColBlock *src, ui
 	uint32 r = *((const uint32 *)(src->row));
 
 	dst[0] = 0;
-	for (i = 0; i < 32; i += 2)
+	for (i = 0; i < 32; i += 4)
 	{
 		dst[0] |= (((r & 3) == 3) ? 0 : 0xf) << i;
 		r >>= 2;
 	}
 
 	dst[1] = 0;
-	for (i = 0; i < 32; i += 2)
+	for (i = 0; i < 32; i += 4)
 	{
 		dst[1] |= (((r & 3) == 3) ? 0 : 0xf) << i;
 		r >>= 2;
