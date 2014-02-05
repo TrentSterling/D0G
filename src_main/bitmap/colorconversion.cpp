@@ -1452,6 +1452,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 	{
 		if (srcImageFormat != IMAGE_FORMAT_DXT1)
 			return false;
+		Assert(!srcStride && !dstStride);
 		ConvertImageFormat_DXT1_To_ATCRGB(src, dst, width, height);
 		return true;
 	}
@@ -1459,11 +1460,13 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 	{
 		if (srcImageFormat == IMAGE_FORMAT_DXT1_ONEBITALPHA)
 		{
+			Assert(!srcStride && !dstStride);
 			ConvertImageFormat_DXT1_To_ATCRGBA(src, dst, width, height);
 			return true;
 		}
 		if (srcImageFormat == IMAGE_FORMAT_DXT3)
 		{
+			Assert(!srcStride && !dstStride);
 			ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
 			return true;
 		}
@@ -1473,6 +1476,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 	{
 		if (srcImageFormat != IMAGE_FORMAT_DXT5)
 			return false;
+		Assert(!srcStride && !dstStride);
 		ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
 		return true;
 	}
