@@ -123,12 +123,12 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 	{
 		// Block compressed formats
 		if ( imageFormat == IMAGE_FORMAT_DXT1 || imageFormat == IMAGE_FORMAT_DXT3 ||
-			 imageFormat == IMAGE_FORMAT_DXT5  || imageFormat == IMAGE_FORMAT_ATI2N ||
+			 imageFormat == IMAGE_FORMAT_DXT5  ||
 #ifdef __ANDROID__
 			 imageFormat == IMAGE_FORMAT_ATC || imageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA ||
 			 imageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA ||
 #endif
-			 imageFormat == IMAGE_FORMAT_ATI1N )
+			 imageFormat == IMAGE_FORMAT_ATI2N || imageFormat == IMAGE_FORMAT_ATI1N )
 		{
 /*
 			DDSURFACEDESC desc;
