@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 4-Wheel Vehicle attempt at a airboat!
 //
@@ -346,8 +346,10 @@ void IVP_Controller_Raycast_Airboat::DoSimulationSteering(IVP_Event_Sim *pEventS
 
 	IVP_FLOAT flRotSpeed = pAirboatCore->rot_speed.k[1];
 	flSteeringSign = (flRotSpeed < 0.0f ? -1.0f : 1.0f);
-	flForceRotational += 0.0004 * flMass * flRotSpeed * flRotSpeed * pEventSim->i_delta_time * flSteeringSign;
-	flForceRotational += 0.001 * flMass * fabsf(flRotSpeed) * pEventSim->i_delta_time * flSteeringSign;
+
+	IVP_FLOAT flForceImpulse = flMass * pEventSim->i_delta_time * flSteeringSign;
+	flForceRotational += 0.0004f * flRotSpeed * flRotSpeed * flForceImpulse;
+	flForceRotational += 0.001f * fabsf(flRotSpeed) * flForceImpulse;
 
 	IVP_U_Float_Point vecAngularImpulse;
 	vecAngularImpulse.set(0.0f, -flForceRotational, 0.0f);
