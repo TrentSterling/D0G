@@ -1451,7 +1451,10 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 	else if (dstImageFormat == IMAGE_FORMAT_ATC)
 	{
 		if (srcImageFormat != IMAGE_FORMAT_DXT1)
+		{
+			Assert(0);
 			return false;
+		}
 		Assert(!srcStride && !dstStride);
 		ConvertImageFormat_DXT1_To_ATCRGB(src, dst, width, height);
 		return true;
@@ -1470,12 +1473,16 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 			ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
 			return true;
 		}
+		Assert(0);
 		return false;
 	}
 	else if (dstImageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA)
 	{
 		if (srcImageFormat != IMAGE_FORMAT_DXT5)
+		{
+			Assert(0);
 			return false;
+		}
 		Assert(!srcStride && !dstStride);
 		ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
 		return true;
@@ -1489,6 +1496,11 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 			  srcImageFormat == IMAGE_FORMAT_DXT1  ||
 			  srcImageFormat == IMAGE_FORMAT_DXT3  ||
 			  srcImageFormat == IMAGE_FORMAT_DXT5  ||
+#ifdef __ANDROID__
+			  srcImageFormat == IMAGE_FORMAT_ATC                   ||
+			  srcImageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA     ||
+			  srcImageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA ||
+#endif
 			  srcImageFormat == IMAGE_FORMAT_ATI1N ||
 			  srcImageFormat == IMAGE_FORMAT_ATI2N )
 	{
@@ -1496,6 +1508,14 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		Assert( IsPC() );
 		return false;
 	}
+#ifdef __ANDROID__
+	else if ((srcImageFormat == IMAGE_FORMAT_UV88) && (dstFormat == IMAGE_FORMAT_IA88))
+	{
+		Assert(!srcStride && !dstStride);
+		memcpy(dst, src, (width * height) << 1);
+		return true;
+	}
+#endif
 	else
 	{
 		// uncompressed textures
