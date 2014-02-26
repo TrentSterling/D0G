@@ -100,6 +100,9 @@ enum ImageFormat
 	IMAGE_FORMAT_LE_BGRX8888,
 	IMAGE_FORMAT_LE_BGRA8888,
 #elif defined(__ANDROID__)
+	IMAGE_FORMAT_RGBA4444,
+	IMAGE_FORMAT_RGBA5551,
+
 	IMAGE_FORMAT_ATC,
 	IMAGE_FORMAT_ATC_EXPLICITALPHA,
 	IMAGE_FORMAT_ATC_INTERPOLATEDALPHA,
@@ -205,6 +208,29 @@ struct BGR565_t
 #pragma bitfield_order( pop )
 #endif
 
+#ifdef __ANDROID__
+struct RGB565_t
+{
+	unsigned short r : 5;		// order of names changes
+	unsigned short g : 6;		//  byte order of output to 32 bit
+	unsigned short b : 5;
+	inline RGB565_t& operator=( const BGRA8888_t& in )
+	{
+		r = in.r >> 3;
+		g = in.g >> 2;
+		b = in.b >> 3;
+		return *this;
+	}
+	inline RGB565_t &Set( int red, int green, int blue )
+	{
+		r = red >> 3;
+		g = green >> 2;
+		b = blue >> 3;
+		return *this;
+	}
+};
+#endif
+
 struct BGRA5551_t
 {
 	unsigned short b : 5;		// order of names changes
@@ -221,6 +247,24 @@ struct BGRA5551_t
 	}
 };
 
+#ifdef __ANDROID__
+struct RGBA5551_t
+{
+	unsigned short r : 5;		// order of names changes
+	unsigned short g : 5;		//  byte order of output to 32 bit
+	unsigned short b : 5;
+	unsigned short a : 1;
+	inline RGBA5551_t& operator=( const BGRA8888_t& in )
+	{
+		r = in.r >> 3;
+		g = in.g >> 3;
+		b = in.b >> 3;
+		a = in.a >> 7;
+		return *this;
+	}
+};
+#endif
+
 struct BGRA4444_t
 {
 	unsigned short b : 4;		// order of names changes
@@ -236,6 +280,24 @@ struct BGRA4444_t
 		return *this;
 	}
 };
+
+#ifdef __ANDROID__
+struct RGBA4444_t
+{
+	unsigned short r : 4;		// order of names changes
+	unsigned short g : 4;		//  byte order of output to 32 bit
+	unsigned short b : 4;
+	unsigned short a : 4;
+	inline RGBA4444_t& operator=( const BGRA8888_t& in )
+	{
+		r = in.r >> 4;
+		g = in.g >> 4;
+		b = in.b >> 4;
+		a = in.a >> 4;
+		return *this;
+	}
+};
+#endif
 
 struct RGBX5551_t
 {
