@@ -1225,9 +1225,11 @@ void ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(const uint8 *src, uint8 *dst, int w
 	int i;
 	for (i = (width * height) >> 4; i-- > 0; )
 	{
-		*(((int *)dst)++) = *(((const int *)src)++); // Alpha block.
-		*(((int *)dst)++) = *(((const int *)src)++); // Ditto.
-		DXTColBlockToATC(((const DXTColBlock *)src)++, ((DXTColBlock *)dst)++);
+		*((int *)dst) = *((const int *)src); // Alpha block.
+		*((int *)(dst + 4)) = *((const int *)(src + 4)); // Ditto.
+		DXTColBlockToATC((const DXTColBlock *)(src + 8), (DXTColBlock *)(dst + 8));
+		src += 16;
+		dst += 16;
 	}
 }
 #endif
@@ -1509,7 +1511,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		return false;
 	}
 #ifdef __ANDROID__
-	else if ((srcImageFormat == IMAGE_FORMAT_UV88) && (dstFormat == IMAGE_FORMAT_IA88))
+	else if ((srcImageFormat == IMAGE_FORMAT_UV88) && (dstImageFormat == IMAGE_FORMAT_IA88))
 	{
 		Assert(!srcStride && !dstStride);
 		memcpy(dst, src, (width * height) << 1);

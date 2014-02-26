@@ -730,7 +730,7 @@ inline T WordSwapAsm(T w)
 {
 	__asm__ __volatile__ (
 		"xchg %b0, %h0\n"
-		: "+r" (w)
+		: "+Q" (w) // GCC tried to use register %sil with +r.
 	);
 	return w;
 }
