@@ -1495,7 +1495,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 #ifdef __ANDROID__
 			if (dstImageFormat == IMAGE_FORMAT_RGB565)
 			{
-				ConvertFromDXT5(src, (RGB565_t *)dst, width, height);
+				ConvertFromDXT5IgnoreAlpha(src, (RGB565_t *)dst, width, height);
 				return true;
 			}
 			if (dstImageFormat == IMAGE_FORMAT_RGBA4444)
