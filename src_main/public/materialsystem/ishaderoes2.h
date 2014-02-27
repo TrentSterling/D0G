@@ -114,7 +114,7 @@ struct OES2ShaderCreationData_t
 	// Required precision specifiers.
 	OES2ShaderPrecision_t m_PrecisionPSFloat;
 
-	void Defaults(void)
+	OES2ShaderCreationData_t(void)
 	{
 		m_VertexCount = 0;
 		m_PixelCount = 0;
