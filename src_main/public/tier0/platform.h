@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose:
 //
@@ -730,7 +730,7 @@ inline T WordSwapAsm(T w)
 {
 	__asm__ __volatile__ (
 		"xchg %b0, %h0\n"
-		: "+Q" (w) // GCC tried to use register %sil with +r.
+		: "+Q" (w)
 	);
 	return w;
 }

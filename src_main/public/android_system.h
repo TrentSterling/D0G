@@ -10,6 +10,7 @@
 
 #include "android_native_app_glue.h"
 #include <jni.h>
+#include "tier0/platform.h"
 
 PLATFORM_INTERFACE struct android_app *ANDR_GetApp(void);
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);

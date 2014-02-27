@@ -6,6 +6,7 @@ An attempt to port Half-Life 2 and Portal to Android tablets and consoles.
 ## Done
 ### Unreleased
 * VPhysics.
+* Shader API for OpenGL ES 2.0 and 3.0.
 
 ### Released
 * Common and public headers.

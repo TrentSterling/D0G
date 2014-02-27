@@ -16,15 +16,14 @@ LOCAL_CPPFLAGS += $(DOG_CPPFLAGS)
 ifeq ($(DOG_PROJECT),android_launcher_main)
   LOCAL_MODULE := android_launcher_main
 else
-  LOCAL_MODULE := $(notdir $(DOG_PROJECT))_android_$(DOG_LIBSUFFIX)
+  LOCAL_MODULE := $(DOG_PROJECT)_android_$(DOG_LIBSUFFIX)
 endif
 LOCAL_SHORT_COMMANDS := true
 LOCAL_SRC_FILES := $(DOG_SRC_FILES)
 ifeq ($(DOG_STATIC_LIBRARY),true)
-  LOCAL_CFLAGS += -D_LIB -D_STATIC_LINKED
   include $(BUILD_STATIC_LIBRARY)
 else
-  LOCAL_CFLAGS += -D_SHARED_LIB -D_USRDLL
+  LOCAL_CFLAGS += -D_SHARED_LIB
   LOCAL_LDFLAGS := -shared -landroid -llog
   ifneq ($(DOG_PROJECT),android_launcher_main)
     LOCAL_LDFLAGS += -L"$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)" -lgnustl_shared -lsupc++

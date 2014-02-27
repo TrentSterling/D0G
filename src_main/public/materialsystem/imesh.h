@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -18,6 +18,7 @@
 #include <cstd/string.h>
 #include "tier0/dbg.h"
 #include "tier2/meshutils.h"
+#include "mathlib/mathlib.h"
 
 
 //-----------------------------------------------------------------------------
@@ -1113,10 +1114,9 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX7_t &vertex )
 	Assert( m_CompressionType == VERTEX_COMPRESSION_NONE ); // FIXME: support compressed verts if needed
 	Assert( m_nCurrentVertex < m_nMaxVertexCount );
 
-#if defined( _WIN32 ) && !defined( _X360 )
 	const void *pRead = &vertex;
 	void *pCurrPos = m_pCurrPosition;
-
+#if defined( _WIN32 ) && !defined( _X360 )
 	__asm
 	{
 		mov esi, pRead
@@ -1138,6 +1138,28 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX7_t &vertex )
 
 			emms
 	}
+#elif defined(_LINUX)
+#if defined(__ARM_NEON__)
+	*((float32x4x3_t *)pCurrPos) = *((const float32x4x3_t *)pRead);
+#elif defined(__arm__)
+	memcpy(pCurrPos, pRead, 48);
+#else
+	__asm__ __volatile__ (
+						  "movq (%0), %%mm0\n"
+						  "movq 8(%0), %%mm1\n"
+						  "movq 16(%0), %%mm2\n"
+						  "movq 24(%0), %%mm3\n"
+						  "movq 32(%0), %%mm4\n"
+						  "movq 40(%0), %%mm5\n"
+						  "movntq %%mm0, (%1)\n"
+						  "movntq %%mm1, 8(%1)\n"
+						  "movntq %%mm2, 16(%1)\n"
+						  "movntq %%mm3, 24(%1)\n"
+						  "movntq %%mm4, 32(%1)\n"
+						  "movntq %%mm5, 40(%1)\n"
+						  "emms\n"
+						  :: "r" (pRead), "r" (pCurrPos) : "memory");
+#endif
 #else
 	Error( "Implement CMeshBuilder::FastVertex(dx7) ");
 #endif
@@ -1156,9 +1178,9 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX7_t &vertex )
 	Assert( m_CompressionType == VERTEX_COMPRESSION_NONE ); // FIXME: support compressed verts if needed
 	Assert( m_nCurrentVertex < m_nMaxVertexCount );
 
-#if defined( _WIN32 ) && !defined( _X360 )
 	const void *pRead = &vertex;
 	void *pCurrPos = m_pCurrPosition;
+#if defined( _WIN32 ) && !defined( _X360 )
 	__asm
 	{
 		mov esi, pRead
@@ -1172,6 +1194,19 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX7_t &vertex )
 			movntps [edi + 16], xmm1
 			movntps [edi + 32], xmm2
 	}
+#elif defined(_LINUX)
+#if defined(__ARM_NEON__)
+	*((float32x4x3_t *)pCurrPos) = *((const float32x4x3_t *)pRead);
+#elif defined(__arm__)
+	memcpy(pCurrPos, pRead, 48);
+#else
+	__m128 m1 = _mm_load_ps((float *)pRead);
+	__m128 m2 = _mm_load_ps((float *)pRead + 4);
+	__m128 m3 = _mm_load_ps((float *)pRead + 8);
+	_mm_stream_ps((float *)pCurrPos, m1);
+	_mm_stream_ps((float *)pCurrPos + 4, m2);
+	_mm_stream_ps((float *)pCurrPos + 8, m3);
+#endif
 #else
 	Error( "Implement CMeshBuilder::FastVertexSSE(dx7)" );
 #endif
@@ -1194,8 +1229,8 @@ inline void CVertexBuilder::Fast4VerticesSSE(
 	Assert( m_CompressionType == VERTEX_COMPRESSION_NONE ); // FIXME: support compressed verts if needed
 	Assert( m_nCurrentVertex < m_nMaxVertexCount-3 );
 
-#if defined( _WIN32 ) && !defined( _X360 )
 	void *pCurrPos = m_pCurrPosition;
+#if defined( _WIN32 ) && !defined( _X360 )
 	__asm
 	{
 		mov esi, vtx_a
@@ -1237,6 +1272,43 @@ inline void CVertexBuilder::Fast4VerticesSSE(
 
 	}
 #else
+#if defined(__ARM_NEON__)
+	*((float32x4x3_t *)pCurrPos) = *((const float32x4x3_t *)vtx_a);
+	*((float32x4x3_t *)pCurrPos + 1) = *((const float32x4x3_t *)vtx_b);
+	*((float32x4x3_t *)pCurrPos + 2) = *((const float32x4x3_t *)vtx_c);
+	*((float32x4x3_t *)pCurrPos + 3) = *((const float32x4x3_t *)vtx_d);
+#elif defined(__arm__)
+	memcpy(pCurrPos, vtx_a, 48);
+	memcpy((char *)pCurrPos + 48, vtx_b, 48);
+	memcpy((char *)pCurrPos + 96, vtx_c, 48);
+	memcpy((char *)pCurrPos + 144, vtx_d, 48);
+#else
+	__m128 m1, m2, m3;
+	m1 = _mm_load_ps((float *)vtx_a);
+	m2 = _mm_load_ps((float *)vtx_a + 4);
+	m3 = _mm_load_ps((float *)vtx_a + 8);
+	_mm_stream_ps((float *)pCurrPos, m1);
+	_mm_stream_ps((float *)pCurrPos + 4, m2);
+	_mm_stream_ps((float *)pCurrPos + 8, m3);
+	m1 = _mm_load_ps((float *)vtx_b);
+	m2 = _mm_load_ps((float *)vtx_b + 4);
+	m3 = _mm_load_ps((float *)vtx_b + 8);
+	_mm_stream_ps((float *)pCurrPos + 12, m1);
+	_mm_stream_ps((float *)pCurrPos + 16, m2);
+	_mm_stream_ps((float *)pCurrPos + 20, m3);
+	m1 = _mm_load_ps((float *)vtx_c);
+	m2 = _mm_load_ps((float *)vtx_c + 4);
+	m3 = _mm_load_ps((float *)vtx_c + 8);
+	_mm_stream_ps((float *)pCurrPos + 24, m1);
+	_mm_stream_ps((float *)pCurrPos + 28, m2);
+	_mm_stream_ps((float *)pCurrPos + 32, m3);
+	m1 = _mm_load_ps((float *)vtx_d);
+	m2 = _mm_load_ps((float *)vtx_d + 4);
+	m3 = _mm_load_ps((float *)vtx_d + 8);
+	_mm_stream_ps((float *)pCurrPos + 36, m1);
+	_mm_stream_ps((float *)pCurrPos + 40, m2);
+	_mm_stream_ps((float *)pCurrPos + 44, m3);
+#endif
 	Error( "Implement CMeshBuilder::Fast4VerticesSSE\n");
 #endif
 	IncrementFloatPointer( m_pCurrPosition, 4*m_VertexSize_Position );
@@ -1252,9 +1324,9 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX8_t &vertex )
 	Assert( m_CompressionType == VERTEX_COMPRESSION_NONE ); // FIXME: support compressed verts if needed
 	Assert( m_nCurrentVertex < m_nMaxVertexCount );
 
-#if defined( _WIN32 ) && !defined( _X360 )
 	const void *pRead = &vertex;
 	void *pCurrPos = m_pCurrPosition;
+#if defined( _WIN32 ) && !defined( _X360 )
 	__asm
 	{
 		mov esi, pRead
@@ -1280,6 +1352,32 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX8_t &vertex )
 
 			emms
 	}
+#elif defined(_LINUX)
+#if defined(__ARM_NEON__)
+	*((float32x4x4_t *)pCurrPos) = *((const float32x4x4_t *)pRead);
+#elif defined(__arm__)
+	memcpy(pCurrPos, pRead, 64);
+#else
+	__asm__ __volatile__ (
+						  "movq (%0), %%mm0\n"
+						  "movq 8(%0), %%mm1\n"
+						  "movq 16(%0), %%mm2\n"
+						  "movq 24(%0), %%mm3\n"
+						  "movq 32(%0), %%mm4\n"
+						  "movq 40(%0), %%mm5\n"
+						  "movq 48(%0), %%mm6\n"
+						  "movq 56(%0), %%mm7\n"
+						  "movntq %%mm0, (%1)\n"
+						  "movntq %%mm1, 8(%1)\n"
+						  "movntq %%mm2, 16(%1)\n"
+						  "movntq %%mm3, 24(%1)\n"
+						  "movntq %%mm4, 32(%1)\n"
+						  "movntq %%mm5, 40(%1)\n"
+						  "movntq %%mm6, 48(%1)\n"
+						  "movntq %%mm7, 56(%1)\n"
+						  "emms\n"
+						  :: "r" (pRead), "r" (pCurrPos) : "memory");
+#endif
 #else
 	Error( "Implement CMeshBuilder::FastVertex(dx8)" );
 #endif
@@ -1298,9 +1396,9 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX8_t &vertex )
 	Assert( m_CompressionType == VERTEX_COMPRESSION_NONE ); // FIXME: support compressed verts if needed
 	Assert( m_nCurrentVertex < m_nMaxVertexCount );
 
-#if defined( _WIN32 ) && !defined( _X360 )
 	const void *pRead = &vertex;
 	void *pCurrPos = m_pCurrPosition;
+#if defined( _WIN32 ) && !defined( _X360 )
 	__asm
 	{
 		mov esi, pRead
@@ -1316,6 +1414,21 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX8_t &vertex )
 			movntps [edi + 32], xmm2
 			movntps [edi + 48], xmm3
 	}
+#elif defined(_LINUX)
+#if defined(__ARM_NEON__)
+	*((float32x4x4_t *)pCurrPos) = *((const float32x4x4_t *)pRead);
+#elif defined(__arm__)
+	memcpy(pCurrPos, pRead, 64);
+#else
+	__m128 m1 = _mm_load_ps((float *)pRead);
+	__m128 m2 = _mm_load_ps((float *)pRead + 4);
+	__m128 m3 = _mm_load_ps((float *)pRead + 8);
+	__m128 m4 = _mm_load_ps((float *)pRead + 12);
+	_mm_stream_ps((float *)pCurrPos, m1);
+	_mm_stream_ps((float *)pCurrPos + 4, m2);
+	_mm_stream_ps((float *)pCurrPos + 8, m3);
+	_mm_stream_ps((float *)pCurrPos + 12, m4);
+#endif
 #else
 	Error( "Implement CMeshBuilder::FastVertexSSE((dx8)" );
 #endif
