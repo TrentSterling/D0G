@@ -1576,8 +1576,17 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 #ifdef __ANDROID__
 	else if ((srcImageFormat == IMAGE_FORMAT_UV88) && (dstImageFormat == IMAGE_FORMAT_IA88))
 	{
-		Assert(!srcStride && !dstStride);
-		memcpy(dst, src, (width * height) << 1);
+		width <<= 1;
+		if (!srcStride)
+			srcStride = width;
+		if (!dstStride)
+			dstStride = width;
+		while (height-- > 0)
+		{
+			memcpy(dst, src, width);
+			dst += dstStride;
+			src += srcStride;
+		}
 		return true;
 	}
 #endif
