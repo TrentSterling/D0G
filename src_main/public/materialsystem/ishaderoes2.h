@@ -91,9 +91,9 @@ enum OES2ShaderPrecision_t
 struct OES2ShaderCreationData_t
 {
 	// Files are loaded and concatenated sequentially.
-	// No prefix - load the file from FS.
+	// Prefix . - load the file from FS.
 	// Prefix / - cache the file globally.
-	// Prefix + - include in place (must end with \n).
+	// No prefix - include in place (must end with \n).
 	// Using pointers instead of arrays because most strings are constant.
 	const char *m_VertexFiles[OES2_SHADER_MAX_FILES];
 	int m_VertexCount;
