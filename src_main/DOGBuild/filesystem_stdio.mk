@@ -11,11 +11,11 @@ DOG_PUBLIC_LIBRARIES := \
   tier2 \
   vstdlib
 DOG_SRC_FILES := \
-  basefilesystem.cpp \
-  filesystem_async.cpp \
-  filesystem_stdio.cpp \
-  filetracker.cpp \
-  ../public/kevvaluescompiler.cpp \
-  ../public/tier0/memoverride.cpp \
-  QueuedLoader.cpp \
-  ../public/zip_utils.cpp
+  filesystem/basefilesystem.cpp \
+  filesystem/filesystem_async.cpp \
+  filesystem/filesystem_stdio.cpp \
+  filesystem/filetracker.cpp \
+  public/kevvaluescompiler.cpp \
+  public/tier0/memoverride.cpp \
+  filesystem/QueuedLoader.cpp \
+  public/zip_utils.cpp

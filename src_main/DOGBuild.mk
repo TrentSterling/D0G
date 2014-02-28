@@ -1,7 +1,7 @@
 DOG_SRC_MAIN := $(call my-dir)
-LOCAL_PATH := $(DOG_SRC_MAIN)/$(DOG_PROJECT)
+LOCAL_PATH := $(DOG_SRC_MAIN)
 
-include $(DOG_PROJECT)/DOGBuild.mk
+include DOGBuild/$(DOG_PROJECT).mk
 
 ifneq ($(DOG_NO_CSTD),true)
   DOG_PUBLIC_LIBRARIES := cstd $(DOG_PUBLIC_LIBRARIES)
@@ -13,7 +13,7 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
   DOG_LIBSUFFIX := arm
   include DOGBuildCore.mk
 
-  ifneq ($(DOG_PROJECT),srcactivity)
+  ifneq ($(DOG_PROJECT),android_launcher_main)
     include $(CLEAR_VARS)
     DOG_LIBSUFFIX := neon
     LOCAL_ARM_NEON := true

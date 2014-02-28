@@ -6,10 +6,10 @@ DOG_PUBLIC_LIBRARIES := \
   tier0 \
   tier1
 DOG_SRC_FILES := \
-  cvar.cpp \
-  jobthread.cpp \
-  KeyValuesSystem.cpp \
-  ../public/tier0/memoverride.cpp \
-  processutils.cpp \
-  random.cpp \
-  vcover.cpp
+  vstdlib/cvar.cpp \
+  vstdlib/jobthread.cpp \
+  vstdlib/KeyValuesSystem.cpp \
+  public/tier0/memoverride.cpp \
+  vstdlib/processutils.cpp \
+  vstdlib/random.cpp \
+  vstdlib/vcover.cpp

@@ -10,6 +10,6 @@ DOG_PUBLIC_LIBRARIES := \
   tier3 \
   vstdlib
 DOG_SRC_FILES := \
-  ../public/filesystem_init.cpp \
-  launcher.cpp \
-  ../public/tier0/memoverride.cpp
+  public/filesystem_init.cpp \
+  android_launcher/launcher.cpp \
+  public/tier0/memoverride.cpp
