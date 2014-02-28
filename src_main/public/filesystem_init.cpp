@@ -1275,7 +1275,7 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 #elif defined(_X360)
 	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio.dll", executablePath, CORRECT_PATH_SEPARATOR);
 #elif defined(__ANDROID__)
-	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem.so", executablePath, CORRECT_PATH_SEPARATOR);
+	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio", executablePath, CORRECT_PATH_SEPARATOR);
 #elif defined(_LINUX)
 	Q_snprintf(pFileSystemDLL, nMaxLen, "%s%cfilesystem_i486.so", executablePath, CORRECT_PATH_SEPARATOR);
 #else
