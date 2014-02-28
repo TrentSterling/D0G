@@ -208,11 +208,10 @@ public:
 
 	// Render state for the ambient light cube
 	virtual void SetVertexShaderStateAmbientLightCube() = 0;
+	virtual void SetPixelShaderStateAmbientLightCube( int pshReg, bool bForceToBlack = false ) = 0;
 #ifdef __ANDROID__
-	virtual void SetPixelShaderStateAmbientLightCube(int pshRegX, int pshRegY, int pshRegZ, bool bForceToBlack = false) = 0;
 	virtual void CommitPixelShaderLighting(int *pshRegs) = 0;
 #else
-	virtual void SetPixelShaderStateAmbientLightCube( int pshReg, bool bForceToBlack = false ) = 0;
 	virtual void CommitPixelShaderLighting(int pshReg) = 0;
 #endif
 
