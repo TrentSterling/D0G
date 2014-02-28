@@ -29,6 +29,6 @@ else
     LOCAL_LDFLAGS += -L"$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)" -lgnustl_shared -lsupc++
   endif
   DOG_LIBRARIES_PREFIXED := $(addprefix -l,$(DOG_SYSTEM_LIBRARIES) $(addsuffix _android_$(DOG_LIBSUFFIX),$(DOG_PUBLIC_LIBRARIES)))
-  LOCAL_LDFLAGS += -L"$(DOG_SRC_MAIN)/bin" -L"$(DOG_SRC_MAIN)/lib" $(DOG_LIBRARIES_PREFIXED) $(DOG_LIBRARIES_PREFIXED)
+  LOCAL_LDFLAGS += -L"$(DOG_SRC_MAIN)/lib" $(DOG_LIBRARIES_PREFIXED) $(DOG_LIBRARIES_PREFIXED)
   include $(BUILD_SHARED_LIBRARY)
 endif
