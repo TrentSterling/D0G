@@ -16,7 +16,7 @@ DOG_SRC_FILES := \
   materialsystem/shaderapioes2/oes2_colorformat.cpp \
   materialsystem/shaderapioes2/oes2_context.cpp \
   materialsystem/shaderapioes2/oes2_debugtextureinfo.cpp \
-  materialsystem/shaderapioes2/oes2_devmgr.cpp \
+  materialsystem/shaderapioes2/oes2_devicemgr.cpp \
   materialsystem/shaderapioes2/oes2_fog.cpp \
   materialsystem/shaderapioes2/oes2_framebuffer.cpp \
   materialsystem/shaderapioes2/oes2_glext.cpp \
