@@ -849,10 +849,10 @@ void CBaseShader::LoadCameraSpaceSphereMapTransform( MaterialMatrixMode_t matrix
 #ifdef __ANDROID__
 	static VMatrix mat
 	(
-		0.5f,  0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f,
-		0.0f,  0.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f, 1.0f
+		0.5f,  0.0f, 0.0f,  0.5f,
+		0.0f, -0.5f, 0.0f, -0.5f,
+		0.0f,  0.0f, 0.0f,  0.0f,
+		0.0f,  0.0f, 0.0f,  1.0f
 	);
 #else
 	static float mat[] = 
@@ -893,9 +893,9 @@ void CBaseShader::SetFixedFunctionTextureTranslation( MaterialMatrixMode_t textu
 #ifdef __ANDROID__
 		// only do the upper 3x3 since this is a 2D matrix
 		VMatrix mat;
-		mat[0][0] = 1.0f;		mat[0][1] = 0.0f;		mat[0][2] = 0.0f;
-		mat[1][0] = 0.0f;		mat[1][1] = 1.0f;		mat[1][2] = 0.0f;
-		mat[2][0] = vDelta[0];	mat[2][1] = vDelta[1];	mat[2][2] = 1.0f;
+		mat[0][0] = 1.0f;		mat[1][0] = 0.0f;		mat[2][0] = 0.0f;
+		mat[0][1] = 0.0f;		mat[1][1] = 1.0f;		mat[2][1] = 0.0f;
+		mat[0][2] = vDelta[0];	mat[1][2] = vDelta[1];	mat[2][2] = 1.0f;
 
 		// Better set the stuff we don't set with some sort of value!
 		mat[0][3] = mat[1][3] = mat[2][3] = 0.0f;
@@ -936,9 +936,9 @@ void CBaseShader::SetFixedFunctionTextureScale( MaterialMatrixMode_t textureTran
 #ifdef __ANDROID__
 		// only do the upper 3x3 since this is a 2D matrix
 		VMatrix mat;
-		mat[0][0] = vScale[0];	mat[0][1] = 0.0f;		mat[0][2] = 0.0f;
-		mat[1][0] = 0.0f;		mat[1][1] = vScale[1];	mat[1][2] = 0.0f;
-		mat[2][0] = 0.0f;		mat[2][1] = 0.0f;		mat[2][2] = 1.0f;
+		mat[0][0] = vScale[0];	mat[1][0] = 0.0f;		mat[2][0] = 0.0f;
+		mat[0][1] = 0.0f;		mat[1][1] = vScale[1];	mat[2][1] = 0.0f;
+		mat[0][2] = 0.0f;		mat[1][2] = 0.0f;		mat[2][2] = 1.0f;
 
 		// Better set the stuff we don't set with some sort of value!
 		mat[0][3] = mat[1][3] = mat[2][3] = 0.0f;
@@ -979,9 +979,9 @@ void CBaseShader::SetFixedFunctionTextureTransform( MaterialMatrixMode_t texture
 #ifdef __ANDROID__
 		// only do the upper 3x3 since this is a 2D matrix
 		VMatrix mat;
-		mat[0][0] = transformation[0][0];	mat[0][1] = transformation[1][0];	mat[0][2] = transformation[3][0];
-		mat[1][0] = transformation[0][1];	mat[1][1] = transformation[1][1];	mat[1][2] = transformation[3][1];
-		mat[2][0] = transformation[0][3];	mat[2][1] = transformation[1][3];	mat[2][2] = transformation[3][3];
+		mat[0][0] = transformation[0][0];	mat[1][0] = transformation[1][0];	mat[2][0] = transformation[3][0];
+		mat[0][1] = transformation[0][1];	mat[1][1] = transformation[1][1];	mat[2][1] = transformation[3][1];
+		mat[0][2] = transformation[0][3];	mat[1][2] = transformation[1][3];	mat[2][2] = transformation[3][3];
 
 		// Better set the stuff we don't set with some sort of value!
 		mat[0][3] = mat[1][3] = mat[2][3] = 0.0f;
@@ -1033,13 +1033,13 @@ void CBaseShader::SetFixedFunctionTextureScaledTransform( MaterialMatrixMode_t t
 #ifdef __ANDROID__
 		VMatrix mat;
 		// only do the upper 3x3 since this is a 2D matrix
-		mat[0][0] = transformation[0][0] * scale[0]; mat[0][1] = transformation[1][0] * scale[0]; mat[0][2] = transformation[3][0] * scale[0];
-		mat[1][0] = transformation[0][1] * scale[1]; mat[1][1] = transformation[1][1] * scale[1]; mat[1][2] = transformation[3][1] * scale[1];
-		mat[2][0] = transformation[0][3];            mat[2][1] = transformation[1][3];            mat[2][2] = transformation[3][3];
+		mat[0][0] = transformation[0][0] * scale[0]; mat[1][0] = transformation[1][0] * scale[0]; mat[2][0] = transformation[3][0] * scale[0];
+		mat[0][1] = transformation[0][1] * scale[1]; mat[1][1] = transformation[1][1] * scale[1]; mat[2][1] = transformation[3][1] * scale[1];
+		mat[0][2] = transformation[0][3];            mat[1][2] = transformation[1][3];            mat[2][2] = transformation[3][3];
 
 		// Better set the stuff we don't set with some sort of value!
-		mat[0][3] = mat[1][3] = mat[2][3] = 0;
-		mat[3][0] = mat[3][1] = mat[3][2] = 0;
+		mat[0][3] = mat[1][3] = mat[2][3] = 0.0f;
+		mat[3][0] = mat[3][1] = mat[3][2] = 0.0f;
 		mat[3][3] = 1.0f;
 #else
 		float mat[16];
