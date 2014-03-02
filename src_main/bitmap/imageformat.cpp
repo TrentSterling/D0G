@@ -94,10 +94,6 @@ static ImageFormatInfo_t g_ImageFormatInfo[] =
 #elif defined(__ANDROID__)
 	{ "RGBA4444",					2, 4, 4, 4, 4, false },			// IMAGE_FORMAT_RGBA4444
 	{ "RGBA5551",					2, 5, 5, 5, 1, false },			// IMAGE_FORMAT_RGBA5551
-
-	{ "ATC",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATC
-	{ "ATC_EXPLICITALPHA",			0, 0, 0, 0, 8, true },			// IMAGE_FORMAT_ATC_EXPLICITALPHA
-	{ "ATC_INTERPOLATEDALPHA",		0, 0, 0, 0, 8, true },			// IMAGE_FORMAT_ATC_INTERPOLATEDALPHA
 #endif
 };
 
@@ -127,10 +123,6 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 		// Block compressed formats
 		if ( imageFormat == IMAGE_FORMAT_DXT1 || imageFormat == IMAGE_FORMAT_DXT3 ||
 			 imageFormat == IMAGE_FORMAT_DXT5  ||
-#ifdef __ANDROID__
-			 imageFormat == IMAGE_FORMAT_ATC || imageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA ||
-			 imageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA ||
-#endif
 			 imageFormat == IMAGE_FORMAT_ATI2N || imageFormat == IMAGE_FORMAT_ATI1N )
 		{
 /*
@@ -166,18 +158,11 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 			{
 			case IMAGE_FORMAT_DXT1:
 			case IMAGE_FORMAT_ATI1N:
-#ifdef __ANDROID__
-			case IMAGE_FORMAT_ATC:
-#endif
 				return numBlocks * 8;
 
 			case IMAGE_FORMAT_DXT3:
 			case IMAGE_FORMAT_DXT5:
 			case IMAGE_FORMAT_ATI2N:
-#ifdef __ANDROID__
-			case IMAGE_FORMAT_ATC_EXPLICITALPHA:
-			case IMAGE_FORMAT_ATC_INTERPOLATEDALPHA:
-#endif
 				return numBlocks * 16;
 			}
 

@@ -1174,90 +1174,6 @@ void ConvertImageFormat_RGBA16161616F_To_RGBA16161616( float16 *pSrcImage, unsig
 	}
 }
 
-#ifdef __ANDROID__
-// Based on "A Method for Load-Time Conversion of DXTC Assets to ATC" by Ray Ratelis and John Bergman, Guild Software, Inc.
-// http://www.guildsoftware.com/papers/2012.Converting.DXTC.to.ATC.pdf
-
-FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *dst)
-{
-	int col0 = src->col0;
-	dst->col0 = ((col0 & 0xf800) >> 1) | ((col0 & 0x7c0) >> 1) | (col0 & 0x1f);
-	dst->col1 = src->col1;
-
-	const int s[] = {0, 3, 1, 2};
-	uint32 r = *((const uint32 *)(src->row));
-	dst->row[0] = s[r         & 3] | (s[(r >>  2) & 3] << 2) | (s[(r >>  4) & 3] << 4) | (s[(r >>  6) & 3] << 6);
-	dst->row[1] = s[(r >> 8)  & 3] | (s[(r >> 10) & 3] << 2) | (s[(r >> 12) & 3] << 4) | (s[(r >> 14) & 3] << 6);
-	dst->row[2] = s[(r >> 16) & 3] | (s[(r >> 18) & 3] << 2) | (s[(r >> 20) & 3] << 4) | (s[(r >> 22) & 3] << 6);
-	dst->row[3] = s[(r >> 24) & 3] | (s[(r >> 26) & 3] << 2) | (s[(r >> 28) & 3] << 4) | (s[ r >> 30     ] << 6);
-}
-
-FORCEINLINE static void DXTColBlockToATCExplicitAlpha(const DXTColBlock *src, uint32 *dst)
-{
-	if (src->col0 > src->col1)
-	{
-		dst[0] = dst[1] = 0xffffffff;
-		return;
-	}
-
-	int i;
-	uint32 r = *((const uint32 *)(src->row));
-
-	dst[0] = 0;
-	for (i = 0; i < 32; i += 4)
-	{
-		dst[0] |= (((r & 3) == 3) ? 0 : 0xf) << i;
-		r >>= 2;
-	}
-
-	dst[1] = 0;
-	for (i = 0; i < 32; i += 4)
-	{
-		dst[1] |= (((r & 3) == 3) ? 0 : 0xf) << i;
-		r >>= 2;
-	}
-}
-
-// DXT1 to ATC.
-void ConvertImageFormat_DXT1_To_ATCRGB(const uint8 *src_, uint8 *dst_, int width, int height)
-{
-	Assert(!(width & 3) && !(height & 3));
-	const DXTColBlock *src = (const DXTColBlock *)src_;
-	DXTColBlock *dst = (DXTColBlock *)dst_;
-	int i;
-	for (i = (width * height) >> 4; i-- > 0; )
-		DXTColBlockToATC(src++, dst++);
-}
-
-// DXT1 to ATC_EXPLICITALPHA.
-void ConvertImageFormat_DXT1_To_ATCRGBA(const uint8 *src_, uint8 *dst, int width, int height)
-{
-	Assert(!(width & 3) && !(height & 3));
-	const DXTColBlock *src = (const DXTColBlock *)src_;
-	int i;
-	for (i = (width * height) >> 4; i-- > 0; ++src, dst += 16)
-	{
-		DXTColBlockToATCExplicitAlpha(src, (uint32 *)dst);
-		DXTColBlockToATC(src, (DXTColBlock *)(dst + 8));
-	}
-}
-
-// DXT3/5 to ATC_EXPLICITALPHA/INTERPOLATEDALPHA.
-void ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(const uint8 *src, uint8 *dst, int width, int height)
-{
-	Assert(!(width & 3) && !(height & 3));
-	int i;
-	for (i = (width * height) >> 4; i-- > 0; )
-	{
-		*((int *)dst) = *((const int *)src); // Alpha block.
-		*((int *)(dst + 4)) = *((const int *)(src + 4)); // Ditto.
-		DXTColBlockToATC((const DXTColBlock *)(src + 8), (DXTColBlock *)(dst + 8));
-		src += 16;
-		dst += 16;
-	}
-}
-#endif
-
 bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
  					     uint8 *dst, ImageFormat dstImageFormat, 
 						 int width, int height, int srcStride, int dstStride )
@@ -1512,47 +1428,6 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		}
 		return false;
 	}
-#ifdef __ANDROID__
-	else if (dstImageFormat == IMAGE_FORMAT_ATC)
-	{
-		if (srcImageFormat != IMAGE_FORMAT_DXT1)
-		{
-			Assert(0);
-			return false;
-		}
-		Assert(!srcStride && !dstStride);
-		ConvertImageFormat_DXT1_To_ATCRGB(src, dst, width, height);
-		return true;
-	}
-	else if (dstImageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA)
-	{
-		if (srcImageFormat == IMAGE_FORMAT_DXT1_ONEBITALPHA)
-		{
-			Assert(!srcStride && !dstStride);
-			ConvertImageFormat_DXT1_To_ATCRGBA(src, dst, width, height);
-			return true;
-		}
-		if (srcImageFormat == IMAGE_FORMAT_DXT3)
-		{
-			Assert(!srcStride && !dstStride);
-			ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
-			return true;
-		}
-		Assert(0);
-		return false;
-	}
-	else if (dstImageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA)
-	{
-		if (srcImageFormat != IMAGE_FORMAT_DXT5)
-		{
-			Assert(0);
-			return false;
-		}
-		Assert(!srcStride && !dstStride);
-		ConvertImageFormat_DXT3_DXT5_To_ATCRGBA(src, dst, width, height);
-		return true;
-	}
-#endif
 	else if ( dstImageFormat == IMAGE_FORMAT_DXT1  ||
 			  dstImageFormat == IMAGE_FORMAT_DXT3  ||
 			  dstImageFormat == IMAGE_FORMAT_DXT5  ||
@@ -1561,11 +1436,6 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 			  srcImageFormat == IMAGE_FORMAT_DXT1  ||
 			  srcImageFormat == IMAGE_FORMAT_DXT3  ||
 			  srcImageFormat == IMAGE_FORMAT_DXT5  ||
-#ifdef __ANDROID__
-			  srcImageFormat == IMAGE_FORMAT_ATC                   ||
-			  srcImageFormat == IMAGE_FORMAT_ATC_EXPLICITALPHA     ||
-			  srcImageFormat == IMAGE_FORMAT_ATC_INTERPOLATEDALPHA ||
-#endif
 			  srcImageFormat == IMAGE_FORMAT_ATI1N ||
 			  srcImageFormat == IMAGE_FORMAT_ATI2N )
 	{

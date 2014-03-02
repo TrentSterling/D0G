@@ -1835,12 +1835,7 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 	else
 	{
 		// Only DXT5 has alpha bits
-		if ( ( fmt == IMAGE_FORMAT_DXT1 )
-#ifdef __ANDROID__
-			|| ( fmt == IMAGE_FORMAT_ATC )
-#endif
-			|| ( fmt == IMAGE_FORMAT_ATI2N )
-			|| ( fmt == IMAGE_FORMAT_ATI1N ) )
+		if ( ( fmt == IMAGE_FORMAT_DXT1 ) || ( fmt == IMAGE_FORMAT_ATI2N ) || ( fmt == IMAGE_FORMAT_ATI1N ) )
 		{
 			m_nFlags &= ~(TEXTUREFLAGS_ONEBITALPHA|TEXTUREFLAGS_EIGHTBITALPHA);
 		}
