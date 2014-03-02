@@ -1186,10 +1186,10 @@ FORCEINLINE static void DXTColBlockToATC(const DXTColBlock *src, DXTColBlock *ds
 
 	const int s[] = {0, 3, 1, 2};
 	uint32 r = *((const uint32 *)(src->row));
-	dst->row[0] = s[r         & 3] | (s[(r >>  2) & 3] << 2) | (s[(r >>  4) & 3] << 4) | (s[r >>  6] << 6);
-	dst->row[1] = s[(r >> 8)  & 3] | (s[(r >> 10) & 3] << 2) | (s[(r >> 12) & 3] << 4) | (s[r >> 14] << 6);
-	dst->row[2] = s[(r >> 16) & 3] | (s[(r >> 18) & 3] << 2) | (s[(r >> 20) & 3] << 4) | (s[r >> 22] << 6);
-	dst->row[3] = s[(r >> 24) & 3] | (s[(r >> 26) & 3] << 2) | (s[(r >> 28) & 3] << 4) | (s[r >> 30] << 6);
+	dst->row[0] = s[r         & 3] | (s[(r >>  2) & 3] << 2) | (s[(r >>  4) & 3] << 4) | (s[(r >>  6) & 3] << 6);
+	dst->row[1] = s[(r >> 8)  & 3] | (s[(r >> 10) & 3] << 2) | (s[(r >> 12) & 3] << 4) | (s[(r >> 14) & 3] << 6);
+	dst->row[2] = s[(r >> 16) & 3] | (s[(r >> 18) & 3] << 2) | (s[(r >> 20) & 3] << 4) | (s[(r >> 22) & 3] << 6);
+	dst->row[3] = s[(r >> 24) & 3] | (s[(r >> 26) & 3] << 2) | (s[(r >> 28) & 3] << 4) | (s[ r >> 30     ] << 6);
 }
 
 FORCEINLINE static void DXTColBlockToATCExplicitAlpha(const DXTColBlock *src, uint32 *dst)
