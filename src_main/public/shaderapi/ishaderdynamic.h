@@ -199,12 +199,7 @@ public:
 	virtual int GetMaxLights( void ) const = 0;
 	virtual const LightDesc_t& GetLight( int lightNum ) const = 0;
 
-#ifdef __ANDROID__
-	virtual void SetVertexShaderFogParams(void) = 0;
-	virtual void SetPixelShaderFogParams(int reg, int colorReg) = 0;
-#else
 	virtual void SetPixelShaderFogParams( int reg ) = 0;
-#endif
 
 	// Render state for the ambient light cube
 	virtual void SetVertexShaderStateAmbientLightCube() = 0;

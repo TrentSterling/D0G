@@ -26,11 +26,8 @@
 // Standard vertex shader constants.
 enum
 {
-	OES2_SHADER_CONST_CAMERA_POS, // f4
 	OES2_SHADER_CONST_MODELVIEWPROJ, // f4x4
 	OES2_SHADER_CONST_VIEWPROJ, // f4x4
-	// OES2_SHADER_CONST_FLEXSCALE, // f1 - unused because when there's no flex, the attribute is set to zero.
-	OES2_SHADER_CONST_FOG_PARAMS, // f4
 	OES2_SHADER_CONST_VIEWMODEL, // f4x4
 	OES2_SHADER_CONST_AMBIENT_LIGHT, // f3[3][2]
 	OES2_SHADER_CONST_LIGHTS_COLOR, // f4[4]
@@ -39,7 +36,6 @@ enum
 	OES2_SHADER_CONST_LIGHTS_SPOT, // f4[4]
 	OES2_SHADER_CONST_LIGHTS_ATTENUATION, // f3[4]
 	OES2_SHADER_CONST_LIGHTS_ENABLE, // i1
-	// OES2_SHADER_CONST_MODULATION_COLOR, // f4 - shader-specific, simply a common name in DX8.
 	OES2_SHADER_CONST_MODEL, // f4x3[n] as f4[3n] - n is 53 when >=256 vertex uniforms are available, 16 otherwise.
 	OES2_SHADER_CONST_COUNT
 };
@@ -70,7 +66,7 @@ enum
 	OES2_SHADER_INPUT_COUNT
 };
 
-#define OES2_SHADER_MAX_CONSTANTS 31 // Should be enough for all shader-specific constants.
+#define OES2_SHADER_MAX_CONSTANTS 32 // Should be enough for all shader-specific constants.
 
 enum OES2ShaderLanguage_t
 {
@@ -100,7 +96,6 @@ struct OES2ShaderCreationData_t
 
 	OES2ShaderConstantUsage_t m_StandardConstants; // A bitfield of OES2_SHADER_CONST_ values.
 	const char *m_Constants[OES2_SHADER_MAX_CONSTANTS]; // An array of used constant names.
-	int m_ConstantCount; // The number of constants in the shader.
 	const char *m_Samplers[OES2_SHADER_MAX_SAMPLERS]; // Sampler uniform names. Will ignore samplers not supported by hardware.
 
 	const char *m_Attributes[OES2_SHADER_INPUT_COUNT]; // An array of the names of used vertex inputs.
@@ -118,7 +113,6 @@ struct OES2ShaderCreationData_t
 		m_PixelCount = 0;
 		m_StandardConstants = 0;
 		memset(m_Constants, 0, sizeof(m_Constants));
-		m_ConstantCount = 0;
 		memset(m_Samplers, 0, sizeof(m_Samplers));
 		memset(m_Attributes, 0, sizeof(m_Attributes));
 		memset(m_TexCoordSizes, 0, sizeof(m_TexCoordSizes));
