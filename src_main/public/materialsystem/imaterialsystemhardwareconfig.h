@@ -190,6 +190,7 @@ public:
 
 #ifdef __ANDROID__
 	virtual int MaxCubeMapTextureSize(void) const = 0;
+	virtual int NumPixelShaderInputs(void) const = 0;
 #endif
 };
 
