@@ -36,7 +36,7 @@ enum
 	OES2_SHADER_CONST_LIGHTS_SPOT, // f4[4]
 	OES2_SHADER_CONST_LIGHTS_ATTENUATION, // f3[4]
 	OES2_SHADER_CONST_LIGHTS_ENABLE, // i1
-	OES2_SHADER_CONST_MODEL, // f4x3[n] as f4[3n] - n is 53 when >=256 vertex uniforms are available, 16 otherwise.
+	OES2_SHADER_CONST_MODEL, // f4x3[16] as f4[48]
 	OES2_SHADER_CONST_COUNT
 };
 typedef uint32 OES2ShaderConstantUsage_t;
