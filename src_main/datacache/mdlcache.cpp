@@ -2406,8 +2406,7 @@ const char *CMDLCache::GetVTXExtension()
 {
 	if (IsAndroid())
 	{
-		// Hardware flex isn't very important, but 128 vertex uniforms on base OES2 are not enough for 53 bones matrices.
-		return (g_pMaterialSystemHardwareConfig->MaxVertexShaderBlendMatrices() >= 53) ? ".dx90.vtx" : ".dx80.vtx";
+		return ".dx80.vtx";
 	}
 	else if ( IsPC() )
 	{
