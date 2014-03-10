@@ -29,7 +29,7 @@ enum
 	OES2_SHADER_CONST_MODELVIEWPROJ, // f4x4
 	OES2_SHADER_CONST_VIEWPROJ, // f4x4
 	OES2_SHADER_CONST_VIEWMODEL, // f4x4
-	OES2_SHADER_CONST_AMBIENT_LIGHT, // f3[3][2]
+	OES2_SHADER_CONST_AMBIENT_LIGHT, // f3[3][2] as f3[6]
 	OES2_SHADER_CONST_LIGHTS_COLOR, // f4[4]
 	OES2_SHADER_CONST_LIGHTS_DIRECTION, // f4[4]
 	OES2_SHADER_CONST_LIGHTS_POSITION, // f3[4]
@@ -74,14 +74,6 @@ enum OES2ShaderLanguage_t
 	OES2_SHADER_LANGUAGE_ESSL3 = 300
 };
 
-enum OES2ShaderPrecision_t
-{
-	OES2_SHADER_PRECISION_LOW,
-	OES2_SHADER_PRECISION_MEDIUM,
-	OES2_SHADER_PRECISION_HIGH,
-	OES2_SHADER_PRECISION_INVALID = -1 // For vertex shader creation.
-};
-
 struct OES2ShaderCreationData_t
 {
 	// Files are loaded and concatenated sequentially.
@@ -104,9 +96,6 @@ struct OES2ShaderCreationData_t
 
 	OES2ShaderLanguage_t m_Language; // GLSL version of the shader.
 
-	// Required precision specifiers.
-	OES2ShaderPrecision_t m_PrecisionPSFloat;
-
 	OES2ShaderCreationData_t(void)
 	{
 		m_VertexCount = 0;
@@ -118,7 +107,6 @@ struct OES2ShaderCreationData_t
 		memset(m_TexCoordSizes, 0, sizeof(m_TexCoordSizes));
 		m_UserDataSize = 0;
 		m_Language = OES2_SHADER_LANGUAGE_ESSL2;
-		m_PrecisionPSFloat = OES2_SHADER_PRECISION_MEDIUM;
 	}
 };
 
