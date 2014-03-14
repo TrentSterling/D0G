@@ -536,7 +536,9 @@ public:
 
 	virtual void PushVertexShaderGPRAllocation( int iVertexShaderCount = 64 ) = 0;
 	virtual void PopVertexShaderGPRAllocation( void ) = 0;
+#endif
 
+#if defined(_X360) || defined(__ANDROID__)
 	virtual void EnableVSync_360( bool bEnable ) = 0; //360 allows us to bypass vsync blocking up to 60 fps without creating a new device
 #endif
 	
