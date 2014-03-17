@@ -542,8 +542,8 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 	Assert( sizeof( BGR565_t ) == 2 );
 	Assert( sizeof( BGRA5551_t ) == 2 );
 	Assert( sizeof( BGRA4444_t ) == 2 );
-#ifdef __ANDROID__
 	Assert( sizeof( RGB565_t ) == 2 );
+#ifdef __ANDROID__
 	Assert( sizeof( RGBA5551_t ) == 2 );
 	Assert( sizeof( RGBA4444_t ) == 2 );
 #endif
@@ -1280,9 +1280,9 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 #ifdef __ANDROID__
 			   dstImageFormat == IMAGE_FORMAT_RGBA4444 ||
 			   dstImageFormat == IMAGE_FORMAT_RGBA5551 ||
-			   dstImageFormat == IMAGE_FORMAT_RGB565 ||
 #endif
 			   dstImageFormat == IMAGE_FORMAT_BGR565 ||
+			   dstImageFormat == IMAGE_FORMAT_RGB565 ||
 			   dstImageFormat == IMAGE_FORMAT_BGR888 ||
 			   dstImageFormat == IMAGE_FORMAT_RGB888 ) &&
 			 ( srcImageFormat == IMAGE_FORMAT_DXT1  ||
@@ -1324,6 +1324,11 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				ConvertFromDXT1( src, ( BGR565_t * )dst, width, height );
 				return true;
 			}
+			if (dstImageFormat == IMAGE_FORMAT_RGB565)
+			{
+				ConvertFromDXT1(src, (RGB565_t *)dst, width, height);
+				return true;
+			}
 			if ( dstImageFormat == IMAGE_FORMAT_BGRA5551 ||
 				dstImageFormat == IMAGE_FORMAT_BGRX5551 )
 			{
@@ -1336,11 +1341,6 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				return true;
 			}
 #ifdef __ANDROID__
-			if (dstImageFormat == IMAGE_FORMAT_RGB565)
-			{
-				ConvertFromDXT1(src, (RGB565_t *)dst, width, height);
-				return true;
-			}
 			if (dstImageFormat == IMAGE_FORMAT_RGBA4444)
 			{
 				ConvertFromDXT1(src, (RGBA4444_t *)dst, width, height);
@@ -1397,6 +1397,11 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				ConvertFromDXT5IgnoreAlpha( src, ( BGR565_t * )dst, width, height );
 				return true;
 			}
+			if (dstImageFormat == IMAGE_FORMAT_RGB565)
+			{
+				ConvertFromDXT5IgnoreAlpha(src, (RGB565_t *)dst, width, height);
+				return true;
+			}
 			if ( dstImageFormat == IMAGE_FORMAT_BGRA5551 ||
 				dstImageFormat == IMAGE_FORMAT_BGRX5551 )
 			{
@@ -1409,11 +1414,6 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				return true;
 			}
 #ifdef __ANDROID__
-			if (dstImageFormat == IMAGE_FORMAT_RGB565)
-			{
-				ConvertFromDXT5IgnoreAlpha(src, (RGB565_t *)dst, width, height);
-				return true;
-			}
 			if (dstImageFormat == IMAGE_FORMAT_RGBA4444)
 			{
 				ConvertFromDXT5(src, (RGBA4444_t *)dst, width, height);

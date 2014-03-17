@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -216,11 +216,37 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 		m_AMask = 0xF0;
 		break;
 
+#ifdef __ANDROID__
+	case IMAGE_FORMAT_RGBA4444:
+		m_Size = 2;
+		m_RShift = -4;
+		m_GShift = 0;
+		m_BShift = 4;
+		m_AShift = 8;
+		m_RMask = 0xF0;
+		m_GMask = 0xF0;
+		m_BMask = 0xF0;
+		m_AMask = 0xF0;
+		break;
+#endif
+
 	case IMAGE_FORMAT_BGR888:
 		m_Size = 3;
 		m_RShift = 16;
 		m_GShift = 8;
 		m_BShift = 0;
+		m_AShift = 0;
+		m_RMask = 0xFF;
+		m_GMask = 0xFF;
+		m_BMask = 0xFF;
+		m_AMask = 0x00;
+		break;
+
+	case IMAGE_FORMAT_RGB888:
+		m_Size = 3;
+		m_RShift = 0;
+		m_GShift = 8;
+		m_BShift = 16;
 		m_AShift = 0;
 		m_RMask = 0xFF;
 		m_GMask = 0xFF;
@@ -240,6 +266,18 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 		m_AMask = 0x00;
 		break;
 
+	case IMAGE_FORMAT_RGB565:
+		m_Size = 2;
+		m_RShift = -3;
+		m_GShift = 3;
+		m_BShift = 8;
+		m_AShift = 0;
+		m_RMask = 0xF8;
+		m_GMask = 0xFC;
+		m_BMask = 0xF8;
+		m_AMask = 0x00;
+		break;
+
 	case IMAGE_FORMAT_BGRA5551:
 	case IMAGE_FORMAT_BGRX5551:
 		m_Size = 2;
@@ -252,6 +290,20 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 		m_BMask = 0xF8;
 		m_AMask = 0x80;
 		break;
+
+#ifdef __ANDROID__
+	case IMAGE_FORMAT_RGBA5551:
+		m_Size = 2;
+		m_RShift = -3;
+		m_GShift = 2;
+		m_BShift = 7;
+		m_AShift = 8;
+		m_RMask = 0xF8;
+		m_GMask = 0xF8;
+		m_BMask = 0xF8;
+		m_AMask = 0x80;
+		break;
+#endif
 
 	// GR - alpha format for HDR support
 	case IMAGE_FORMAT_A8:

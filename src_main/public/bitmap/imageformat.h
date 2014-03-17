@@ -204,7 +204,6 @@ struct BGR565_t
 #pragma bitfield_order( pop )
 #endif
 
-#ifdef __ANDROID__
 struct RGB565_t
 {
 	unsigned short r : 5;		// order of names changes
@@ -225,7 +224,6 @@ struct RGB565_t
 		return *this;
 	}
 };
-#endif
 
 struct BGRA5551_t
 {
