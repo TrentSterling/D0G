@@ -217,12 +217,12 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 		break;
 
 #ifdef __ANDROID__
-	case IMAGE_FORMAT_RGBA4444:
+	case IMAGE_FORMAT_ABGR4444:
 		m_Size = 2;
-		m_RShift = -4;
-		m_GShift = 0;
-		m_BShift = 4;
-		m_AShift = 8;
+		m_RShift = 0;
+		m_GShift = 4;
+		m_BShift = 8;
+		m_AShift = -4;
 		m_RMask = 0xF0;
 		m_GMask = 0xF0;
 		m_BMask = 0xF0;
@@ -292,12 +292,12 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 		break;
 
 #ifdef __ANDROID__
-	case IMAGE_FORMAT_RGBA5551:
+	case IMAGE_FORMAT_ABGR5551:
 		m_Size = 2;
-		m_RShift = -3;
-		m_GShift = 2;
-		m_BShift = 7;
-		m_AShift = 8;
+		m_RShift = 8;
+		m_GShift = 3;
+		m_BShift = -2;
+		m_AShift = -7;
 		m_RMask = 0xF8;
 		m_GMask = 0xF8;
 		m_BMask = 0xF8;

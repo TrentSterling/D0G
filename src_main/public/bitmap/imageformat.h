@@ -100,8 +100,8 @@ enum ImageFormat
 	IMAGE_FORMAT_LE_BGRX8888,
 	IMAGE_FORMAT_LE_BGRA8888,
 #elif defined(__ANDROID__)
-	IMAGE_FORMAT_RGBA4444,
-	IMAGE_FORMAT_RGBA5551,
+	IMAGE_FORMAT_ABGR4444,
+	IMAGE_FORMAT_ABGR5551,
 #endif
 
 	NUM_IMAGE_FORMATS
@@ -242,13 +242,13 @@ struct BGRA5551_t
 };
 
 #ifdef __ANDROID__
-struct RGBA5551_t
+struct ABGR5551_t
 {
-	unsigned short r : 5;		// order of names changes
-	unsigned short g : 5;		//  byte order of output to 32 bit
-	unsigned short b : 5;
-	unsigned short a : 1;
-	inline RGBA5551_t& operator=( const BGRA8888_t& in )
+	unsigned short a : 5;		// order of names changes
+	unsigned short b : 5;		//  byte order of output to 32 bit
+	unsigned short g : 5;
+	unsigned short r : 1;
+	inline ABGR5551_t& operator=( const BGRA8888_t& in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 3;
@@ -276,13 +276,13 @@ struct BGRA4444_t
 };
 
 #ifdef __ANDROID__
-struct RGBA4444_t
+struct ABGR4444_t
 {
-	unsigned short r : 4;		// order of names changes
-	unsigned short g : 4;		//  byte order of output to 32 bit
-	unsigned short b : 4;
-	unsigned short a : 4;
-	inline RGBA4444_t& operator=( const BGRA8888_t& in )
+	unsigned short a : 4;		// order of names changes
+	unsigned short b : 4;		//  byte order of output to 32 bit
+	unsigned short g : 4;
+	unsigned short r : 4;
+	inline ABGR4444_t& operator=( const BGRA8888_t& in )
 	{
 		r = in.r >> 4;
 		g = in.g >> 4;

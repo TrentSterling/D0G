@@ -65,8 +65,8 @@ static void RGBA8888ToUVWQ8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToUVLX8888( const uint8 *src, uint8 *dst, int numPixels );
 //static void RGBA8888ToRGBA16161616F( const uint8 *src, uint8 *dst, int numPixels );
 #ifdef __ANDROID__
-static void RGBA8888ToRGBA5551( const uint8 *src, uint8 *dst, int numPixels );
-static void RGBA8888ToRGBA4444( const uint8 *src, uint8 *dst, int numPixels );
+static void RGBA8888ToABGR5551( const uint8 *src, uint8 *dst, int numPixels );
+static void RGBA8888ToABGR4444( const uint8 *src, uint8 *dst, int numPixels );
 #endif
 
 static void ABGR8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
@@ -92,8 +92,8 @@ static void UVLX8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA16161616ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 //static void RGBA16161616FToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 #ifdef __ANDROID__
-static void RGBA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
-static void RGBA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
+static void ABGR5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
+static void ABGR4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 #endif
 
 
@@ -144,15 +144,9 @@ static UserFormatToRGBA8888Func_t GetUserFormatToRGBA8888Func_t( ImageFormat src
 	case IMAGE_FORMAT_RGBA16161616:
 		return RGBA16161616ToRGBA8888;
 	case IMAGE_FORMAT_RGBA16161616F:
-#ifdef __ANDROID__
-	case IMAGE_FORMAT_RGBA5551:
-		return RGBA5551ToRGBA8888;
-	case IMAGE_FORMAT_RGBA4444:
-		return RGBA4444ToRGBA8888;
-#endif
 		return NULL;
 
-#if defined( _X360 )
+#if defined(_X360)
 	case IMAGE_FORMAT_LINEAR_RGBA8888:
 		return RGBA8888ToRGBA8888;
 	case IMAGE_FORMAT_LINEAR_ABGR8888:
@@ -173,6 +167,11 @@ static UserFormatToRGBA8888Func_t GetUserFormatToRGBA8888Func_t( ImageFormat src
 		return BGRX5551ToRGBA8888;
 	case IMAGE_FORMAT_LINEAR_RGBA16161616:
 		return RGBA16161616ToRGBA8888;
+#elif defined(__ANDROID__)
+	case IMAGE_FORMAT_ABGR5551:
+		return ABGR5551ToRGBA8888;
+	case IMAGE_FORMAT_ABGR4444:
+		return ABGR4444ToRGBA8888;
 #endif
 
 	default:
@@ -247,10 +246,10 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 	case IMAGE_FORMAT_LINEAR_BGRX5551:
 		return RGBA8888ToBGRX5551;
 #elif defined(__ANDROID__)
-	case IMAGE_FORMAT_RGBA5551:
-		return RGBA8888ToRGBA5551;
-	case IMAGE_FORMAT_RGBA4444:
-		return RGBA8888ToRGBA4444;
+	case IMAGE_FORMAT_ABGR5551:
+		return RGBA8888ToABGR5551;
+	case IMAGE_FORMAT_ABGR4444:
+		return RGBA8888ToABGR4444;
 #endif
 
 	default:
@@ -502,28 +501,30 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 	}
 
 	// Write out alpha values to the image bits
+	CDestPixel col;
 	for ( row=0; row < 4; row++, pImPos += width-4 )
 	{
 		for ( pix = 0; pix < 4; pix++ )
 		{
+			col = *((BGRA8888_t *)(&(gACol[row][pix])));
 			// zero the alpha bits of image pixel
 			switch ( nChannelSelect )
 			{
 				case 0:
-					pImPos->r = ( *(( BGRA8888_t *) &(gACol[row][pix])) ).a;
+					pImPos->r = col.a;
 					pImPos->g = 0;	// Danger...stepping on the other color channels
 					pImPos->b = 0;
 					pImPos->a = 0;
 					break;
 				case 1:
-					pImPos->g = ( *(( BGRA8888_t *) &(gACol[row][pix])) ).a;
+					pImPos->g = col.a;
 					break;
 				case 2:
-					pImPos->b = ( *(( BGRA8888_t *) &(gACol[row][pix])) ).a;
+					pImPos->b = col.a;
 					break;
 				default:
 				case 3:
-					pImPos->a = ( *(( BGRA8888_t *) &(gACol[row][pix])) ).a;
+					pImPos->a = col.a;
 					break;
 			}
 
@@ -544,8 +545,8 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 	Assert( sizeof( BGRA4444_t ) == 2 );
 	Assert( sizeof( RGB565_t ) == 2 );
 #ifdef __ANDROID__
-	Assert( sizeof( RGBA5551_t ) == 2 );
-	Assert( sizeof( RGBA4444_t ) == 2 );
+	Assert( sizeof( ABGR5551_t ) == 2 );
+	Assert( sizeof( ABGR4444_t ) == 2 );
 #endif
 
 	int realWidth = 0;
@@ -1278,8 +1279,8 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 			   dstImageFormat == IMAGE_FORMAT_BGRA5551 ||
 			   dstImageFormat == IMAGE_FORMAT_BGRX5551 ||
 #ifdef __ANDROID__
-			   dstImageFormat == IMAGE_FORMAT_RGBA4444 ||
-			   dstImageFormat == IMAGE_FORMAT_RGBA5551 ||
+			   dstImageFormat == IMAGE_FORMAT_ABGR4444 ||
+			   dstImageFormat == IMAGE_FORMAT_ABGR5551 ||
 #endif
 			   dstImageFormat == IMAGE_FORMAT_BGR565 ||
 			   dstImageFormat == IMAGE_FORMAT_RGB565 ||
@@ -1341,14 +1342,14 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				return true;
 			}
 #ifdef __ANDROID__
-			if (dstImageFormat == IMAGE_FORMAT_RGBA4444)
+			if (dstImageFormat == IMAGE_FORMAT_ABGR5551)
 			{
-				ConvertFromDXT1(src, (RGBA4444_t *)dst, width, height);
+				ConvertFromDXT1(src, (ABGR5551_t *)dst, width, height);
 				return true;
 			}
-			if (dstImageFormat == IMAGE_FORMAT_RGBA5551)
+			if (dstImageFormat == IMAGE_FORMAT_ABGR4444)
 			{
-				ConvertFromDXT1(src, (RGBA5551_t *)dst, width, height);
+				ConvertFromDXT1(src, (ABGR4444_t *)dst, width, height);
 				return true;
 			}
 #endif
@@ -1414,14 +1415,14 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 				return true;
 			}
 #ifdef __ANDROID__
-			if (dstImageFormat == IMAGE_FORMAT_RGBA4444)
+			if (dstImageFormat == IMAGE_FORMAT_ABGR5551)
 			{
-				ConvertFromDXT5(src, (RGBA4444_t *)dst, width, height);
+				ConvertFromDXT5(src, (ABGR5551_t *)dst, width, height);
 				return true;
 			}
-			if (dstImageFormat == IMAGE_FORMAT_RGBA5551)
+			if (dstImageFormat == IMAGE_FORMAT_ABGR4444)
 			{
-				ConvertFromDXT5(src, (RGBA5551_t *)dst, width, height);
+				ConvertFromDXT5(src, (ABGR4444_t *)dst, width, height);
 				return true;
 			}
 #endif
@@ -2022,16 +2023,16 @@ void RGBA8888ToBGRA5551( const uint8 *src, uint8 *dst, int numPixels )
 }
 
 #ifdef __ANDROID__
-void RGBA8888ToRGBA5551( const uint8 *src, uint8 *dst, int numPixels )
+void RGBA8888ToABGR5551( const uint8 *src, uint8 *dst, int numPixels )
 {
 	unsigned short* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
-		*pDstShort = ((src[2] >> 3) << 10) |
-					 ((src[1] >> 3) << 5) |
-					  (src[0] >> 3) |
-					  (src[3] >> 7) << 15;
+		*pDstShort = ((src[0] >> 3) << 11) |
+					 ((src[1] >> 3) << 6) |
+					 ((src[2] >> 3) << 1) |
+					  (src[3] >> 7);
 	}
 }
 #endif
@@ -2050,16 +2051,16 @@ void RGBA8888ToBGRA4444( const uint8 *src, uint8 *dst, int numPixels )
 }
 
 #ifdef __ANDROID__
-void RGBA8888ToRGBA4444( const uint8 *src, uint8 *dst, int numPixels )
+void RGBA8888ToABGR4444( const uint8 *src, uint8 *dst, int numPixels )
 {
 	unsigned short* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
-		*pDstShort = ((src[2] >> 4) << 8) |
-					 ((src[1] >> 4) << 4) |
-					  (src[0] >> 4) |
-					 ((src[3] >> 4) << 12);
+		*pDstShort = ((src[0] >> 4) << 12) |
+					 ((src[1] >> 4) << 8) |
+					 ((src[2] >> 4) << 4) |
+					  (src[3] >> 4);
 	}
 }
 #endif
@@ -2323,16 +2324,16 @@ void BGRA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 }
 
 #ifdef __ANDROID__
-void RGBA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
+void ABGR5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
 	unsigned short* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0x1F);
+		int blue = (*pSrcShort >> 10) & 0x1F;
 		int green = (*pSrcShort >> 5) & 0x1F;
-		int red = (*pSrcShort >> 10) & 0x1F;
-		int alpha = *pSrcShort & ( 1 << 15 );
+		int red = (*pSrcShort & 0x1F);
+		int alpha = (*pSrcShort >> 15) & 1;
 
 		// Expand to 8 bits
 		dst[2] = (red << 3) | (red >> 2);
@@ -2371,16 +2372,16 @@ void BGRA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 }
 
 #ifdef __ANDROID__
-void RGBA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
+void ABGR4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
 	unsigned short* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0xF);
-		int green = (*pSrcShort >> 4) & 0xF;
-		int red = (*pSrcShort >> 8) & 0xF;
-		int alpha = (*pSrcShort >> 12) & 0xF;
+		int blue = (*pSrcShort >> 12) & 0xF;
+		int green = (*pSrcShort >> 8) & 0xF;
+		int red = (*pSrcShort >> 4) & 0xF;
+		int alpha = (*pSrcShort & 0xF);
 
 		// Expand to 8 bits
 		dst[2] = (red << 4) | red;

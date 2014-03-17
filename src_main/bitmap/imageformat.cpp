@@ -92,8 +92,8 @@ static ImageFormatInfo_t g_ImageFormatInfo[] =
 	{ "LE_BGRX8888",				4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LE_BGRX8888
 	{ "LE_BGRA8888",				4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LE_BGRA8888
 #elif defined(__ANDROID__)
-	{ "RGBA4444",					2, 4, 4, 4, 4, false },			// IMAGE_FORMAT_RGBA4444
-	{ "RGBA5551",					2, 5, 5, 5, 1, false },			// IMAGE_FORMAT_RGBA5551
+	{ "ABGR4444",					2, 4, 4, 4, 4, false },			// IMAGE_FORMAT_ABGR4444
+	{ "ABGR5551",					2, 5, 5, 5, 1, false },			// IMAGE_FORMAT_ABGR5551
 #endif
 };
 
