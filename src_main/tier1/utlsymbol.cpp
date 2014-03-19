@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: Defines a symbol table
 //
@@ -287,7 +287,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 	char fn[ MAX_PATH ];
 	Q_strncpy( fn, pFileName, sizeof( fn ) );
 	Q_RemoveDotSlashes( fn );
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
 	strlwr( fn );
 #endif
 
@@ -328,7 +328,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 	char fn[ MAX_PATH ];
 	Q_strncpy( fn, pFileName, sizeof( fn ) );
 	Q_RemoveDotSlashes( fn );
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
 	strlwr( fn );
 #endif
 
