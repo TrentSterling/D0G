@@ -125,11 +125,11 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 	dstY += m_iOutlineSize;
 
 	int wide = bitmap.width - srcX;
-	if ((dstX + wide) > rgbaWide)
-		wide = rgbaWide - dstX;
+	if ((dstX + wide + m_iOutlineSize) > rgbaWide)
+		wide = rgbaWide - dstX - m_iOutlineSize;
 	int tall = bitmap.rows - srcY;
-	if ((dstY + tall) > rgbaTall)
-		tall = rgbaTall - dstY;
+	if ((dstY + tall + m_iOutlineSize) > rgbaTall)
+		tall = rgbaTall - dstY - m_iOutlineSize;
 
 	dstX <<= 2;
 	rgbaWide <<= 2;
