@@ -113,12 +113,12 @@ protected:
 	unsigned short	m_rgiBitmapSize[2];
 	bool			m_bUnderlined;
 
-	unsigned int	m_iHeight : 8;
-	unsigned int	m_iMaxCharWidth : 8;
-	unsigned int	m_iAscent : 8;
 #ifdef __ANDROID__
 	unsigned int	m_iBaseline : 8;
 #endif
+	unsigned int	m_iHeight : 8;
+	unsigned int	m_iMaxCharWidth : 8;
+	unsigned int	m_iAscent : 8;
 	
 	unsigned int	m_iDropShadowOffset : 1;
 	unsigned int	m_iOutlineSize : 1;

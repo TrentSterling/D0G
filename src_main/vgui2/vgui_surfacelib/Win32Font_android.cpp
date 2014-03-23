@@ -4,6 +4,7 @@
 // Purpose: Android support for TrueType Fonts.
 //
 //===========================================================================//
+#include <math.h>
 #include <cstd/string.h>
 #include <vgui/ISurface.h>
 #include "vgui_surfacelib/FontManager.h"
@@ -86,11 +87,11 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	tall <<= 6;
 	FT_Set_Char_Size(face, tall, tall, 72, 72);
 
-	FT_Size_Metrics &metrics = face->size->metrics;
-	m_iHeight = CEIL_FT_PIXEL(metrics.height) + m_iDropShadowOffset + (m_iOutlineSize << 1);
-	m_iMaxCharWidth = CEIL_FT_PIXEL(metrics.max_advance);
-	m_iAscent = CEIL_FT_PIXEL(metrics.ascender);
-	m_iBaseline = CEIL_FT_PIXEL(metrics.height + metrics.descender);
+	float scale = ((float)(face->size->metrics.ascender) * (1.0f / 64.0f)) / (float)(face->ascender);
+	m_iBaseline = (int)(ceilf((float)(face->bbox.yMax) * scale));
+	m_iHeight = m_iBaseline + (int)(ceilf((float)(-face->bbox.yMin) * scale)) + m_iDropShadowOffset + (m_iOutlineSize << 1);
+	m_iMaxCharWidth = CEIL_FT_PIXEL(face->size->metrics.max_advance);
+	m_iAscent = (int)(ceilf((float)(face->ascender) * scale));
 
 	m_rgiBitmapSize[0] = m_iMaxCharWidth + (m_iOutlineSize << 1);
 	m_rgiBitmapSize[1] = m_iHeight;
