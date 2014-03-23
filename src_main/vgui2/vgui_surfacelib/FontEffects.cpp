@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: Font effects that operate on linear rgba data
 //
@@ -147,12 +147,20 @@ FORCEINLINE void GetBlurValueForPixel(unsigned char *src, int blur, float *gauss
 	float accum = 0.0f;
 
 	// scan the positive x direction
-	int maxX = min(srcX + blur, rgbaWide);
-	int minX = max(srcX - blur, 0);
+	int maxX = srcX + blur;
+	if (maxX > rgbaWide)
+		maxX = rgbaWide;
+	int minX = srcX - blur;
+	if (minX < 0)
+		minX = 0;
 	for (int x = minX; x <= maxX; x++)
 	{
-		int maxY = min(srcY + blur, rgbaTall - 1);
-		int minY = max(srcY - blur, 0);
+		int maxY = srcY + blur;
+		if (maxY > (rgbaTall - 1))
+			maxY = rgbaTall - 1;
+		int minY = srcY - blur;
+		if (minY < 0)
+			minY = 0;
 		for (int y = minY; y <= maxY; y++)
 		{
 			unsigned char *srcPos = src + ((x + (y * rgbaWide)) * 4);
@@ -165,7 +173,9 @@ FORCEINLINE void GetBlurValueForPixel(unsigned char *src, int blur, float *gauss
 	}
 
 	dest[0] = dest[1] = dest[2] = 255; //leave ALL pixels white or we get black backgrounds mixed in
-	dest[3] = min( (int)accum, 255); //blur occurs entirely in the alpha
+	dest[3] = (int)accum; //blur occurs entirely in the alpha
+	if (dest[3] > 255)
+		dest[3] = 255;
 }
 
 //-----------------------------------------------------------------------------
