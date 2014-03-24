@@ -198,7 +198,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 	}
 
 	// alloc a new buffer
-	unsigned char *src = (unsigned char *)_alloca(rgbaWide * rgbaTall * 4);
+	unsigned char *src = new unsigned char[rgbaWide * rgbaTall * 4];
 
 	// copy in
 	memcpy(src, rgba, rgbaWide * rgbaTall * 4);
@@ -216,5 +216,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 			dest += 4;
 		}
 	}
+
+	delete[] src;
 }
 
