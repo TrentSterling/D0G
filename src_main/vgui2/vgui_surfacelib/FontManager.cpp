@@ -481,8 +481,9 @@ const char *g_szValidAsianFonts[] = { "Marlett", NULL };
 FallbackFont_t g_FallbackFonts[] =
 {
 #ifdef __ANDROID__
-	{ "Times New Roman", "Droid Sans Mono" },
 	{ "Courier New", "Droid Sans Mono" },
+	{ "Lucida Console", "Droid Sans Mono" },
+	{ "Times New Roman", "Droid Sans Mono" },
 	{ "Roboto Regular", NULL },
 	{ NULL, "Roboto Regular" }
 #else
