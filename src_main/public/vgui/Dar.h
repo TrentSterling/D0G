@@ -50,7 +50,7 @@ public:
 	}
 	int AddElement(ELEMTYPE elem)
 	{
-		return AddToTail( elem );
+		return this->AddToTail( elem );
 	}
 	void MoveElementToEnd( ELEMTYPE elem )
 	{
@@ -58,24 +58,24 @@ public:
 			return;
 
 		// quick check to see if it's already at the end
-		if ( Element( this->Count() - 1 ) == elem )
+		if ( this->Element( this->Count() - 1 ) == elem )
 			return;
 
-		int idx = Find( elem );
+		int idx = this->Find( elem );
 		if ( idx == this->InvalidIndex() )
 			return;
 
 		this->Remove( idx );
-		AddToTail( elem );
+		this->AddToTail( elem );
 	}
 	// returns the index of the element in the array, -1 if not found
 	int FindElement(ELEMTYPE elem)
 	{
-		return Find( elem );
+		return this->Find( elem );
 	}
 	bool HasElement(ELEMTYPE elem)
 	{
-		if ( FindElement(elem) != this->InvalidIndex() )
+		if ( this->FindElement(elem) != this->InvalidIndex() )
 		{
 			return true;
 		}
@@ -83,17 +83,17 @@ public:
 	}
 	int PutElement(ELEMTYPE elem)
 	{
-		int index = FindElement(elem);
+		int index = this->FindElement(elem);
 		if (index >= 0)
 		{
 			return index;
 		}
-		return AddElement(elem);
+		return this->AddElement(elem);
 	}
 	// insert element at index and move all the others down 1
 	void InsertElementAt(ELEMTYPE elem,int index)
 	{
-		InsertBefore( index, elem );
+		this->InsertBefore( index, elem );
 	}
 	void SetElementAt(ELEMTYPE elem,int index)
 	{
@@ -114,7 +114,7 @@ public:
 
 	void RemoveElement(ELEMTYPE elem)
 	{
-		FindAndRemove( elem );
+		this->FindAndRemove( elem );
 	}
 
 	void *GetBaseData()
@@ -124,7 +124,7 @@ public:
 
 	void CopyFrom(Dar<ELEMTYPE> &dar)
 	{
-		CoypArray( dar.Base(), dar.Count() );
+		this->CopyArray( dar.Base(), dar.Count() );
 	}
 };
 
