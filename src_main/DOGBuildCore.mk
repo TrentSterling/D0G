@@ -3,7 +3,7 @@ LOCAL_C_INCLUDES := \
   "$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/include" \
   "$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(TOOLCHAIN_VERSION)/libs/$(TARGET_ARCH_ABI)/include" \
   "$(DOG_SRC_MAIN)/common" "$(DOG_SRC_MAIN)/public" $(DOG_C_INCLUDES)
-LOCAL_CFLAGS := -DNDEBUG -D_LINUX=1 $(addprefix -D,$(DOG_C_DEFINES)) -ffast-math -O2 -Wno-attributes -Wno-write-strings
+LOCAL_CFLAGS := -DNDEBUG -D_LINUX=1 $(addprefix -D,$(DOG_C_DEFINES)) -ffast-math -O2 -Wno-attributes -Wno-conversion-null -Wno-write-strings
 ifneq ($(DOG_LONG_WCHAR),true)
   LOCAL_CFLAGS += -DWCHAR_MAX=(65535) -DWCHAR_MIN=(0) -fshort-wchar
 endif
