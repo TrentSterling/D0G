@@ -482,9 +482,6 @@ FallbackFont_t g_FallbackFonts[] =
 #ifdef __ANDROID__
 	{ "Times New Roman", "Droid Sans Mono" },
 	{ "Courier New", "Droid Sans Mono" },
-	{ "Verdana", "Roboto Regular" },
-	{ "Trebuchet MS", "Roboto Regular" },
-	{ "Tahoma", "Roboto Regular" },
 	{ "Roboto Regular", NULL },
 	{ NULL, "Roboto Regular" }
 #else
