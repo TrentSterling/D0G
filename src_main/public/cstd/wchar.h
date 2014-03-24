@@ -29,6 +29,8 @@ THE SOFTWARE. */
 #ifndef CSTD_WCHAR_H
 #define CSTD_WCHAR_H
 
+#include <ctype.h>
+
 #ifdef _WIN32
 #include <wchar.h>
 #include <wctype.h>

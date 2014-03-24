@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <cstd/stdio.h>
-#include <ctype.h>
+#include <cstd/wchar.h>
 
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>

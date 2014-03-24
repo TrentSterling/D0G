@@ -11,7 +11,8 @@
 #include <windows.h>
 #include <imm.h>
 #endif
-#include <string.h>
+#include <cstd/string.h>
+#include <cstd/wchar.h>
 
 #include "vgui_internal.h"
 #include "VPanel.h"

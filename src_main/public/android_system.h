@@ -12,6 +12,8 @@
 #include <jni.h>
 #include "tier0/platform.h"
 
+typedef int32_t (*ANDR_INPUTHANDLER)(struct android_app *app, AInputEvent *event);
+
 PLATFORM_INTERFACE struct android_app *ANDR_GetApp(void);
 PLATFORM_INTERFACE const char *ANDR_GetLanguageString(void);
 PLATFORM_INTERFACE const char *ANDR_GetLibraryPath(void);

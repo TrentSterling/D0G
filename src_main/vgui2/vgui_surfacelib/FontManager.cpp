@@ -18,6 +18,7 @@
 #include "vgui_surfacelib/FontManager.h"
 #include <vgui/ISurface.h>
 #include <tier0/dbg.h>
+#include <cstd/wchar.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
