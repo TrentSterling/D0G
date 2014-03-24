@@ -76,8 +76,7 @@ public:
 	void SetCachedXUIMetrics( const char *pWindowsFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] );
 #elif defined(__ANDROID__)
 	bool AddFontFile(const char *fullPath);
-	FORCEINLINE const unsigned char *GetFontFile(const char *windowsFontName) const
-		{ int index = m_FontFiles.Find(windowsFontName); return (index != m_FontFiles.InvalidIndex()) ? m_FontFiles[index] : NULL; }
+	const unsigned char *GetFontFile(const char *windowsFontName);
 	FORCEINLINE FT_Library GetFTLibrary(void) { return m_FTLibrary; }
 #endif
 
@@ -115,8 +114,10 @@ private:
 	CUtlVector< XUIMetricCache_t > m_XUIMetricCache;
 #elif defined(__ANDROID__)
 	FT_Library m_FTLibrary;
-	CUtlDict<unsigned char *, unsigned short> m_FontFiles;
-	CUtlFilenameSymbolTable m_FontFileNames;
+	// Loading fonts on demand - the Japanese font is huge.
+	CUtlDict<unsigned char *, unsigned short> m_FontFiles; // Fonts loaded into buffers.
+	CUtlFilenameSymbolTable m_FontFileNames; // Pool of font file names.
+	CUtlDict<FileNameHandle_t, unsigned short> m_FontNames; // Font name:file name dictionary of symbols in m_FontFileNames.
 #endif
 };
 

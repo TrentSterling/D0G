@@ -127,8 +127,9 @@ void CFontManager::ClearAllFonts()
 	}
 	m_Win32Fonts.RemoveAll();
 #ifdef __ANDROID__
-	m_FontFiles.PurgeAndDeleteElements();
+	m_FontNames.Purge();
 	m_FontFileNames.RemoveAll();
+	m_FontFiles.PurgeAndDeleteElements();
 #endif
 }
 
@@ -534,10 +535,15 @@ struct Win98ForeignFallbackFont_t
 // list of how fonts fallback
 Win98ForeignFallbackFont_t g_Win98ForeignFallbackFonts[] =
 {
+#ifdef __ANDROID__
+	{ "japanese", "MotoyaLMaru W3 mono" },
+	{ NULL, "Roboto Regular" }
+#else
 	{ "russian", "system" },
 	{ "japanese", "win98japanese" },
 	{ "thai", "system" },
 	{ NULL, "Tahoma" },		// every other font falls back to this
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -545,15 +551,13 @@ Win98ForeignFallbackFont_t g_Win98ForeignFallbackFonts[] =
 //-----------------------------------------------------------------------------
 const char *CFontManager::GetForeignFallbackFontName()
 {
-#ifdef __ANDROID__
-	return "Roboto Regular";
-#endif
-
+#ifndef __ANDROID__
 	if ( s_bSupportsUnicode )
 	{
 		// tahoma has all the necessary characters for asian/russian languages for winXP/2K+
 		return "Tahoma";
 	}
+#endif
 
 	int i;
 	for (i = 0; g_Win98ForeignFallbackFonts[i].language != NULL; i++)
@@ -631,21 +635,24 @@ bool CFontManager::AddFontFile(const char *fullPath)
 	if (m_FontFileNames.FindFileName(fullPath))
 		return true;
 
-	unsigned char *file = NULL;
 	FileHandle_t fileHandle = m_pFileSystem->Open(fullPath, "rb");
 	if (!fileHandle)
 		return false;
 	int fileSize = m_pFileSystem->Size(fileHandle);
-	file = new unsigned char[fileSize + sizeof(int)];
-	*((int *)file) = fileSize;
-	m_pFileSystem->Read(file + sizeof(int), fileSize, fileHandle);
+	if (!fileSize)
+	{
+		m_pFileSystem->Close(fileHandle);
+		return false;
+	}
+	unsigned char *file = new unsigned char[fileSize];
+	m_pFileSystem->Read(file, fileSize, fileHandle);
 	m_pFileSystem->Close(fileHandle);
 
 	FT_Face face = NULL;
 
 	FT_Open_Args args;
 	args.flags = FT_OPEN_MEMORY | FT_OPEN_DRIVER;
-	args.memory_base = file + sizeof(int);
+	args.memory_base = file;
 	args.memory_size = fileSize;
 	args.stream = NULL;
 	args.driver = FT_Get_Module(m_FTLibrary, "truetype");
@@ -680,16 +687,37 @@ bool CFontManager::AddFontFile(const char *fullPath)
 	}
 
 	FT_Done_Face(face);
+	delete[] file;
 
 	if (!(name[0]))
-	{
-		delete[] file;
 		return false;
-	}
 
-	m_FontFiles.Insert(name, file);
-	m_FontFileNames.FindOrAddFileName(fullPath);
+	m_FontNames.Insert(name, m_FontFileNames.FindOrAddFileName(fullPath));
 	return true;
+}
+
+const unsigned char *CFontManager::GetFontFile(const char *windowsFontName)
+{
+	int fileIndex = m_FontFiles.Find(windowsFontName);
+	if (fileIndex != m_FontFiles.InvalidIndex())
+		return m_FontFiles[fileIndex];
+
+	unsigned short fileNameHandle = m_FontNames.Find(windowsFontName);
+	if (fileNameHandle == m_FontNames.InvalidIndex())
+		return NULL;
+
+	char fileName[MAX_PATH];
+	m_FontFileNames.String(m_FontNames[fileNameHandle], fileName, MAX_PATH);
+	FileHandle_t fileHandle = m_pFileSystem->Open(fileName, "rb");
+	if (!fileHandle)
+		return NULL;
+	int fileSize = m_pFileSystem->Size(fileHandle);
+	unsigned char *file = new unsigned char[fileSize + sizeof(int)];
+	*((int *)file) = fileSize;
+	m_pFileSystem->Read(file + sizeof(int), fileSize, fileHandle);
+	m_pFileSystem->Close(fileHandle);
+	m_FontFiles.Insert(windowsFontName, file);
+	return file;
 }
 #endif
 
