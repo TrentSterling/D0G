@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: 
 //
@@ -632,12 +632,8 @@ void KeyValues::RecursiveSaveToFile( IBaseFileSystem *filesystem, FileHandle_t f
 					{
 						static char buf[KEYVALUES_TOKEN_SIZE];
 						// make sure we have enough space
-#ifdef _WIN32
-						Assert(::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, NULL, 0, NULL, NULL) < KEYVALUES_TOKEN_SIZE);
-						if (::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, buf, KEYVALUES_TOKEN_SIZE, NULL, NULL))
-#else
-						Assert(wcstombs(buf, dat->m_wsValue, KEYVALUES_TOKEN_SIZE) < KEYVALUES_TOKEN_SIZE);
-#endif
+						int result = Q_UnicodeToUTF8( dat->m_wsValue, buf, KEYVALUES_TOKEN_SIZE);
+						if (result)
 						{
 							WriteIndents(filesystem, f, pBuf, indentLevel + 1);
 							INTERNALWRITE("\"", 1);
@@ -1144,15 +1140,16 @@ const char *KeyValues::GetString( const char *keyName, const char *defaultValue 
 		{
 			// convert the string to char *, set it for future use, and return it
 			char wideBuf[512];
-#ifdef _WIN32
-			if (::WideCharToMultiByte(CP_UTF8, 0, dat->m_wsValue, -1, wideBuf, 512, NULL, NULL))
-#else
-			if (wcstombs(wideBuf, dat->m_wsValue, 512) < 512)
-#endif
+			int result = Q_UnicodeToUTF8(dat->m_wsValue, wideBuf, 512);
+			if ( result )
+			{
 				// note: this will copy wideBuf
-				SetString(keyName, wideBuf);
+				SetString( keyName, wideBuf );
+			}
 			else
+			{
 				return defaultValue;
+			}
 			break;
 		}
 		case TYPE_STRING:
@@ -1194,16 +1191,19 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			break;
 		case TYPE_STRING:
 		{
-			static wchar_t wbuftemp[512]; // convert to wide
-#ifdef _WIN32
-			if (::MultiByteToWideChar(CP_UTF8, 0, dat->m_sValue, -1, wbuftemp, 512))
-#else
-			int result = mbstowcs(wbuftemp, dat->m_sValue, 512);
-			if ((result >= 0) && (result < 512))
-#endif
-				SetWString(keyName, wbuftemp);
+			int bufSize = Q_strlen(dat->m_sValue) + 1;
+			wchar_t *pWBuf = new wchar_t[ bufSize ];
+			int result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
+			if ( result >= 0 ) // may be a zero length string
+			{
+				SetWString( keyName, pWBuf);
+			}
 			else
+			{
+				delete [] pWBuf;
 				return defaultValue;
+			}
+			delete [] pWBuf;
 			break;
 		}
 		default:

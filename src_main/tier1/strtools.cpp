@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: String Tools
 //
@@ -915,16 +915,29 @@ char *V_pretifynum( int64 value )
 //-----------------------------------------------------------------------------
 int V_UTF8ToUnicode( const char *pUTF8, wchar_t *pwchDest, int cubDestSizeInBytes )
 {
-	AssertValidStringPtr(pUTF8);
-	AssertValidWritePtr(pwchDest);
+	// pwchDest can be null to allow for getting the length of the string
+	if ( cubDestSizeInBytes > 0 )
+	{
+		AssertValidWritePtr(pwchDest);
+		pwchDest[0] = 0;
+	}
 
-	pwchDest[0] = 0;
+	if ( !pUTF8 )
+		return 0;
+
+	AssertValidStringPtr(pUTF8);
+
 #ifdef _WIN32
 	int cchResult = MultiByteToWideChar( CP_UTF8, 0, pUTF8, -1, pwchDest, cubDestSizeInBytes / sizeof(wchar_t) );
 #elif _LINUX
-	int cchResult = mbstowcs( pwchDest, pUTF8, cubDestSizeInBytes / sizeof(wchar_t) );
+	int cchResult = mbstowcs( pwchDest, pUTF8, cubDestSizeInBytes / sizeof(wchar_t) ) + 1;
 #endif
-	pwchDest[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = 0;
+
+	if ( cubDestSizeInBytes > 0 )
+	{
+		pwchDest[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = 0;
+	}
+
 	return cchResult;
 }
 
@@ -933,16 +946,27 @@ int V_UTF8ToUnicode( const char *pUTF8, wchar_t *pwchDest, int cubDestSizeInByte
 //-----------------------------------------------------------------------------
 int V_UnicodeToUTF8( const wchar_t *pUnicode, char *pUTF8, int cubDestSizeInBytes )
 {
-	AssertValidStringPtr(pUTF8, cubDestSizeInBytes);
+	//AssertValidStringPtr(pUTF8, cubDestSizeInBytes); // no, we are sometimes pasing in NULL to fetch the length of the buffer needed.
 	AssertValidReadPtr(pUnicode);
 
-	pUTF8[0] = 0;
+	if ( cubDestSizeInBytes > 0 )
+	{
+		pUTF8[0] = 0;
+	}
+
 #ifdef _WIN32
 	int cchResult = WideCharToMultiByte( CP_UTF8, 0, pUnicode, -1, pUTF8, cubDestSizeInBytes, NULL, NULL );
 #elif _LINUX
-	int cchResult = wcstombs( pUTF8, pUnicode, cubDestSizeInBytes );
+	int cchResult = 0;
+	if ( pUnicode && pUTF8 )
+		cchResult = wcstombs( pUTF8, pUnicode, cubDestSizeInBytes ) + 1;
 #endif
-	pUTF8[cubDestSizeInBytes - 1] = 0;
+
+	if ( cubDestSizeInBytes > 0 )
+	{
+		pUTF8[cubDestSizeInBytes - 1] = 0;
+	}
+
 	return cchResult;
 }
 
@@ -1881,13 +1905,38 @@ void V_StrRight( const char *pStr, int nChars, char *pOut, int outSize )
 //-----------------------------------------------------------------------------
 void V_strtowcs( const char *pString, int nInSize, wchar_t *pWString, int nOutSize )
 {
+	Assert( nOutSize >= sizeof(pWString[0]) );
 #ifdef _WIN32
-	if ( !MultiByteToWideChar( CP_UTF8, 0, pString, nInSize, pWString, nOutSize ) )
+	int nOutSizeInChars = nOutSize / sizeof(pWString[0]);
+	int result = MultiByteToWideChar( CP_UTF8, 0, pString, nInSize, pWString, nOutSizeInChars );
+	// If the string completely fails to fit then MultiByteToWideChar will return 0.
+	// If the string exactly fits but with no room for a null-terminator then MultiByteToWideChar
+	// will happily fill the buffer and omit the null-terminator, returning nOutSizeInChars.
+	// Either way we need to return an empty string rather than a bogus and possibly not
+	// null-terminated result.
+	if ( result <= 0 || result >= nOutSizeInChars )
 	{
-		*pWString = L'\0';
+		// If nInSize includes the null-terminator then a result of nOutSizeInChars is
+		// legal. We check this by seeing if the last character in the output buffer is
+		// a zero.
+		if ( result == nOutSizeInChars && pWString[ nOutSizeInChars - 1 ] == 0)
+		{
+			// We're okay! Do nothing.
+		}
+		else
+		{
+			// The string completely to fit. Null-terminate the buffer.
+			*pWString = L'\0';
+		}
+	}
+	else
+	{
+		// We have successfully converted our string. Now we need to null-terminate it, because
+		// MultiByteToWideChar will only do that if nInSize includes the source null-terminator!
+		pWString[ result ] = 0;
 	}
 #elif _LINUX
-	if ( mbstowcs( pWString, pString, nOutSize / sizeof(wchar_t) ) <= 0 )
+	if ( mbstowcs( pWString, pString, nOutSize / sizeof(pWString[0]) ) <= 0 )
 	{
 		*pWString = 0;
 	}
@@ -1897,9 +1946,31 @@ void V_strtowcs( const char *pString, int nInSize, wchar_t *pWString, int nOutSi
 void V_wcstostr( const wchar_t *pWString, int nInSize, char *pString, int nOutSize )
 {
 #ifdef _WIN32
-	if ( !WideCharToMultiByte( CP_UTF8, 0, pWString, nInSize, pString, nOutSize, NULL, NULL ) )
+	int result = WideCharToMultiByte( CP_UTF8, 0, pWString, nInSize, pString, nOutSize, NULL, NULL );
+	// If the string completely fails to fit then MultiByteToWideChar will return 0.
+	// If the string exactly fits but with no room for a null-terminator then MultiByteToWideChar
+	// will happily fill the buffer and omit the null-terminator, returning nOutSize.
+	// Either way we need to return an empty string rather than a bogus and possibly not
+	// null-terminated result.
+	if ( result <= 0 || result >= nOutSize )
 	{
-		*pString = '\0';
+		// If nInSize includes the null-terminator then a result of nOutSize is
+		// legal. We check this by seeing if the last character in the output buffer is
+		// a zero.
+		if ( result == nOutSize && pWString[ nOutSize - 1 ] == 0)
+		{
+			// We're okay! Do nothing.
+		}
+		else
+		{
+			*pString = '\0';
+		}
+	}
+	else
+	{
+		// We have successfully converted our string. Now we need to null-terminate it, because
+		// MultiByteToWideChar will only do that if nInSize includes the source null-terminator!
+		pString[ result ] = '\0';
 	}
 #elif _LINUX
 	if ( wcstombs( pString, pWString, nOutSize ) <= 0 )

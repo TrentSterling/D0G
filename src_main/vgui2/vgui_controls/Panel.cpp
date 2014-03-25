@@ -2212,7 +2212,8 @@ wchar_t const *Panel::KeyCodeModifiersToDisplayString( KeyCode code, int modifie
 	}
 
 	static wchar_t unicode[ 256 ];
-	_snwprintf( unicode, 255, L"%S%s", sz, Panel::KeyCodeToDisplayString( (KeyCode)code ) );
+	V_UTF8ToUnicode(sz, unicode, sizeof(unicode));
+	wcscat(unicode, Panel::KeyCodeToDisplayString((KeyCode)code));
 	return unicode;
 }
 
