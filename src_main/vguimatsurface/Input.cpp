@@ -92,10 +92,10 @@ static HWND s_hLastHWnd = 0;
 //-----------------------------------------------------------------------------
 #ifdef __ANDROID__
 
-FORCEINLINE static int32_t CallChainedInputHandler(struct android_app *app, AInputEvent *event)
+FORCEINLINE static int32_t CallChainedInputHandler(struct android_app *app, AInputEvent *aEvent)
 {
 	if (s_ChainedInputHandler)
-		return s_ChainedInputHandler(app, event);
+		return s_ChainedInputHandler(app, aEvent);
 	return 0;
 }
 
