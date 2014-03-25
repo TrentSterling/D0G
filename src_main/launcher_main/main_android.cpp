@@ -1,5 +1,5 @@
 //===== Copyright © 1996-2013, Valve Corporation, All rights reserved. ======//
-//============= D0G modifications © 2013, SiPlus, MIT licensed. =============//
+//============= D0G modifications © 2014, SiPlus, MIT licensed. =============//
 //
 // Purpose: A redirection tool that allows the DLLs to reside elsewhere.
 //
@@ -99,7 +99,7 @@ void android_main(struct android_app *app)
 	if (!dlopen(libPath, RTLD_NOW | RTLD_GLOBAL))
 		LauncherMainError("Failed to load dll vstdlib");
 
-	strcpy(libPath + libLength, "android_launcher");
+	strcpy(libPath + libLength, "launcher");
 	strcat(libPath, libAddition);
 	void *launcher = dlopen(libPath, RTLD_NOW);
 	if (!launcher)
