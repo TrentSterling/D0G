@@ -14,7 +14,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define CEIL_FT_PIXEL(px) (((px) + 63) >> 6)
 #define WIN32FONT_FLAGS_MASK (~(vgui::ISurface::FONTFLAG_UNDERLINE | vgui::ISurface::FONTFLAG_ANTIALIAS))
 
 CWin32Font::CWin32Font(void) : m_ExtendedABCWidthsCache(256, 0, &ExtendedABCWidthsCacheLessFunc)
@@ -90,7 +89,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	float scale = ((float)(face->size->metrics.ascender) * (1.0f / 64.0f)) / (float)(face->ascender);
 	m_iBaseline = (int)(ceilf((float)(face->bbox.yMax) * scale));
 	m_iHeight = m_iBaseline + (int)(ceilf((float)(-face->bbox.yMin) * scale)) + m_iDropShadowOffset + (m_iOutlineSize << 1);
-	m_iMaxCharWidth = CEIL_FT_PIXEL(face->size->metrics.max_advance);
+	m_iMaxCharWidth = (face->size->metrics.max_advance + 127) >> 6;
 	m_iAscent = (int)(ceilf((float)(face->ascender) * scale));
 
 	m_rgiBitmapSize[0] = m_iMaxCharWidth + (m_iOutlineSize << 1);
@@ -102,18 +101,11 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *rgba)
 {
 	unsigned int glyphIndex = FT_Get_Char_Index(m_FTFace, ch);
-	if (!glyphIndex || FT_Load_Glyph(m_FTFace, glyphIndex, FT_LOAD_RENDER))
+	if (!glyphIndex || FT_Load_Glyph(m_FTFace, glyphIndex, FT_LOAD_NO_HINTING | FT_LOAD_RENDER))
 		return;
 	FT_GlyphSlot glyph = m_FTFace->glyph;
 	FT_Bitmap &bitmap = glyph->bitmap;
 
-	int srcX = 0;
-	int dstX = glyph->bitmap_left;
-	if (dstX < 0)
-	{
-		srcX = -dstX;
-		dstX = 0;
-	}
 	int srcY = 0;
 	int dstY = m_iBaseline - glyph->bitmap_top; 
 	if (dstY < 0)
@@ -121,11 +113,10 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 		srcY = -dstY;
 		dstY = 0;
 	}
-
-	dstX += m_iOutlineSize;
 	dstY += m_iOutlineSize;
 
-	int wide = bitmap.width - srcX;
+	int dstX = m_iOutlineSize;
+	int wide = bitmap.width;
 	if ((dstX + wide + m_iOutlineSize) > rgbaWide)
 		wide = rgbaWide - dstX - m_iOutlineSize;
 	int tall = bitmap.rows - srcY;
@@ -139,7 +130,7 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 	int x;
 	for (; tall-- > 0; srcRow += bitmap.pitch, dstRow += rgbaWide)
 	{
-		for (x = wide, src = srcRow + srcX, dst = dstRow + dstX; x-- > 0; ++src, dst += 4)
+		for (x = wide, src = srcRow, dst = dstRow + dstX; x-- > 0; ++src, dst += 4)
 		{
 			if (!(*src))
 				continue;
@@ -183,12 +174,12 @@ void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	}
 
 	unsigned int glyphIndex = FT_Get_Char_Index(m_FTFace, ch);
-	if (glyphIndex && !FT_Load_Glyph(m_FTFace, glyphIndex, FT_LOAD_DEFAULT))
+	if (glyphIndex && !FT_Load_Glyph(m_FTFace, glyphIndex, FT_LOAD_NO_HINTING))
 	{
 		FT_Glyph_Metrics &metrics = m_FTFace->glyph->metrics;
-		a = CEIL_FT_PIXEL(metrics.horiBearingX);
-		b = CEIL_FT_PIXEL(metrics.width);
-		c = CEIL_FT_PIXEL(metrics.horiAdvance - metrics.horiBearingX - metrics.width);
+		a = metrics.horiBearingX >> 6;
+		b = (metrics.width + 127) >> 6; // +127 to ceil and to add 1 pixel for anti-aliasing.
+		c = (metrics.horiAdvance - metrics.horiBearingX - metrics.width) >> 6;
 	}
 	else
 	{
