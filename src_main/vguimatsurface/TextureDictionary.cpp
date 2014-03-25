@@ -525,10 +525,6 @@ void CMatSystemTexture::SetMaterial( IMaterial *pMaterial )
 		return;
 	}
 
-#ifdef __ANDROID__
-	m_pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NOFOG, true);
-#endif
-
 	// Increment its reference count
 	m_pMaterial->IncrementReferenceCount();
 
