@@ -180,7 +180,9 @@ void CBaseShader::SetInitialShadowState( )
 	if (flags & MATERIAL_VAR_IGNOREZ)
 	{
 		s_pShaderShadow->EnableDepthTest( false );
+#ifndef __ANDROID__ // In OES, disabling depth testing also disables depth writing.
 		s_pShaderShadow->EnableDepthWrites( false );
+#endif
 	}
 
 	if (flags & MATERIAL_VAR_DECAL)
