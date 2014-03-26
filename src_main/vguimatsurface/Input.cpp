@@ -92,7 +92,7 @@ static HWND s_hLastHWnd = 0;
 //-----------------------------------------------------------------------------
 #ifdef __ANDROID__
 
-FORCEINLINE static int32_t CallChainedInputHandler(struct android_app *app, AInputEvent *aEvent)
+FORCEINLINE static int32_t ChainInputHandler(struct android_app *app, AInputEvent *aEvent)
 {
 	if (s_ChainedInputHandler)
 		return s_ChainedInputHandler(app, aEvent);
@@ -102,7 +102,7 @@ FORCEINLINE static int32_t CallChainedInputHandler(struct android_app *app, AInp
 static int32_t MatSurfaceInputHandler(struct android_app *app, AInputEvent *aEvent)
 {
 	if (!s_bInputEnabled)
-		return CallChainedInputHandler(app, aEvent);
+		return ChainInputHandler(app, aEvent);
 
 	InputEvent_t event;
 	memset(&event, 0, sizeof(event));
@@ -122,7 +122,7 @@ static int32_t MatSurfaceInputHandler(struct android_app *app, AInputEvent *aEve
 					g_pInputSystem->PostUserEvent(event);
 					return 1;
 				}
-				int retVal = CallChainedInputHandler(app, aEvent);
+				int retVal = ChainInputHandler(app, aEvent);
 				event.m_nType = IE_KeyCodeTyped;
 				event.m_nData = KeyCode_VirtualKeyToVGUI(AKeyEvent_getKeyCode(aEvent));
 				return retVal;
@@ -149,7 +149,7 @@ static int32_t MatSurfaceInputHandler(struct android_app *app, AInputEvent *aEve
 
 	// D0GTODO: IMPORTANT: Android input - motion events.
 
-	return CallChainedInputHandler(app, aEvent);
+	return ChainInputHandler(app, aEvent);
 }
 
 #else
