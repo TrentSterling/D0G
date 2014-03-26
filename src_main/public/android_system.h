@@ -12,7 +12,7 @@
 #include <jni.h>
 #include "tier0/platform.h"
 
-typedef int32_t (*ANDR_APPCMDHANDLER)(struct android_app *app, int32_t cmd);
+typedef void (*ANDR_APPCMDHANDLER)(struct android_app *app, int32_t cmd);
 typedef int32_t (*ANDR_INPUTHANDLER)(struct android_app *app, AInputEvent *aEvent);
 
 PLATFORM_INTERFACE struct android_app *ANDR_GetApp(void);
